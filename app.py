@@ -1,3 +1,1 @@
-
-
-print("Hello, from GFG!")
+print("Hello world!")
