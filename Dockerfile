@@ -1,9 +1,8 @@
-FROM python:3.10-slim
+FROM python:3.9-slim-bookworm
+RUN apt-get update
+RUN pip3 install rpyc
 
 WORKDIR /src
-COPY . .
+COPY src/ /src/
 
-# Install any needed packages specified in requirements.txt 
-RUN pip install --no-cache-dir -r requirements.txt
-
-CMD ["python", "app.py"]
+CMD [ "/bin/bash", "-c", "while true; do bash -l; done" ]

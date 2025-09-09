@@ -1,16 +1,25 @@
+# Setup
+
 Create virtual environment
 ```
 python -m venv venv
-source venv/bin/activate
+.\venv\Scripts\Activate
 ```
 
-
-To build an image.
+To install the packages
 ```
-docker build -t my-python-app .
+pip install -r requirements.txt
 ```
 
 To update the packages
 ```
 pip freeze > requirements.txt
 ```
+# Docker 
+
+To build an image and run them.
+```
+docker build --pull -t ads:lab .
+docker compose up
+```
+

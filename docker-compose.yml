@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  server:
+    image: ads:lab
+    container_name: server
+    command: ["python", "server.py"]
+  client:
+    image: ads:lab
+    container_name: client
+    depends_on:
+      - server
+    command: ["python", "client.py"]
