@@ -1,12 +1,20 @@
 version: "3.9"
 services:
-  server:
-    image: ads:lab
-    container_name: server
-    command: ["python", "server.py"]
+
   client:
     image: ads:lab
     container_name: client
     depends_on:
       - server
     command: ["python", "client.py"]
+  
+  server:
+    image: ads:lab
+    container_name: server
+    depends_on:
+      - redis
+    command: ["python", "-u", "server.py"]
+  
+  redis:
+    image: redis:7
+    container_name: redis
