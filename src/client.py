@@ -13,9 +13,9 @@ if __name__ == "__main__":
         result = conn.root.count_words(text, keyword)
 
         # Print the result
-        print(f"Request: {i+1}", flush=True)
-        print(f"Text: {text}", flush=True)
-        print(f"Keyword: {keyword}", flush=True)
-        print(f"Word count: {result}", flush=True)
+        print(f"Request: {i+1}")
+        print(f"Text: {text}")
+        print(f"Keyword: {keyword}")
+        print(f"Word count: {result}")
 
     conn.close()
