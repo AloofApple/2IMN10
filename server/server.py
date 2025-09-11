@@ -13,7 +13,7 @@ class WordCountService(rpyc.Service):
     def exposed_count_words(self, filepath: str, keyword: str) -> int:
 
         # Read the file content
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, "r", encoding="utf-8") as f: # UNSAFE: Update to use reference
             text = f.read()
 
         # Get result from cache
