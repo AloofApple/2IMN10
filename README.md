@@ -1,11 +1,13 @@
-# TODO
+# Docker 
 
-TODO: Restructure the folders such that the client, server and load balancer have a own folder Each folder needs its own docker file.    
+To build an image and run them.
+```
+docker-compose up --build
+```
 
+# Virtual Environment 
 
-# Setup
-
-Create virtual environment
+To create virtual environment run the following commands, else install the dependencies locally.
 ```
 python -m venv venv
 .\venv\Scripts\Activate
@@ -20,11 +22,3 @@ To update the packages
 ```
 pip freeze > requirements.txt
 ```
-# Docker 
-
-To build an image and run them.
-```
-docker-compose up --build
-```
-
-
