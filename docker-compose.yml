@@ -5,17 +5,37 @@ services:
     image: ads-client:lab
     container_name: client
     depends_on:
-      - server
+      - loadbalancer
     command: ["python", "-u", "client.py"]
   
-  server:
+  server1:
     build: ./server
     image: ads-server:lab
-    container_name: server
+    container_name: server1
     depends_on:
       - redis
     ports:
       - "5000:5000"
+    command: ["python", "-u", "server.py"]
+    
+  server2:
+    build: ./server
+    image: ads-server:lab
+    container_name: server2
+    depends_on:
+      - redis
+    ports:
+      - "5001:5000"
+    command: ["python", "-u", "server.py"]
+    
+  server3:
+    build: ./server
+    image: ads-server:lab
+    container_name: server3
+    depends_on:
+      - redis
+    ports:
+      - "5002:5000"
     command: ["python", "-u", "server.py"]
   
   redis:
@@ -23,3 +43,15 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+
+  loadbalancer:
+    build: ./load_balancer
+    image: ads-loadbalancer:lab
+    container_name: loadbalancer
+    depends_on:
+      - server1
+      - server2
+      - server3
+    ports:
+      - "1200:1200"
+    command: ["python", "-u", "simple_redirect.py"]

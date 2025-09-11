@@ -1,25 +1,27 @@
 import asyncio
+import random
 from http import server
 
 LOAD_BALANCER_HOST = ""
 LOAD_BALANCER_PORT = 1200
 
 
-
-SERVERS = [5000, 5001, 5002]
+SERVERHOSTS = ["server1", "server2", "server3"]
+SERVERSPORTS = [5000, 5001, 5002]
+server_to_redirect = 0
 
 
 async def handle_client(reader, writer):
 
     # here, we decide which server to forward the request to -> LB ALGORITHM!!
-
-    server_to_redirect = 0
+    server_to_redirect = RoundRobin(server_to_redirect, SERVERSPORTS)
+    #server_to_redirect = RandomSelection(SERVERS)
 
     print(f"Redirecting to server {server_to_redirect + 1}")
 
     # forward the request to server
     try:
-        server_reader, server_writer = await asyncio.open_connection("127.0.0.1", SERVERS[server_to_redirect])
+        server_reader, server_writer = await asyncio.open_connection(SERVERHOSTS[server_to_redirect], SERVERSPORTS[server_to_redirect])
     except ConnectionError:
         writer.close()
         return
@@ -42,13 +44,17 @@ async def handle_client(reader, writer):
         forward(server_reader, writer)
     )
 
+# Some easy load balancing algorithms but we can choose harders ones later
+# Because for that we need to do more monitoring of the servers.
+def RoundRobin(current_server: int, total_servers: int) -> int:
+    return (current_server + 1) % len(total_servers)
 
-
-
+def RandomSelection(total_servers: int) -> int:
+    return random.randint(0, total_servers - 1)
 
 
 async def main():
-    server = await asyncio.start_server(handle_client, "127.0.0.1", 8888)
+    server = await asyncio.start_server(handle_client, "127.0.0.1", LOAD_BALANCER_PORT)
     print(f"Load balancer running on {LOAD_BALANCER_HOST}:{LOAD_BALANCER_PORT}")
     async with server:
         await server.serve_forever()

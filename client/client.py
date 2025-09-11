@@ -1,10 +1,10 @@
 import rpyc
 
-HOSTNAME = "server"
-SERVERPORT = 5000
+HOSTNAME = "server1" #loadbalancer"
+PORT = 5000 #1200
 
 if __name__ == "__main__":
-    conn = rpyc.connect(HOSTNAME, SERVERPORT)
+    conn = rpyc.connect(HOSTNAME, PORT)
 
     for i in range (2):
         file_ref = 0
