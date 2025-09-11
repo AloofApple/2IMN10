@@ -10,10 +10,17 @@ REDISPORT = 6379
 r = redis.Redis(HOSTNAME, REDISPORT)
 
 class WordCountService(rpyc.Service):
-    def exposed_count_words(self, text: str, keyword: str) -> int:
-        key = f"{keyword}-{text}"
+    def exposed_count_words(self, filepath: str, keyword: str) -> int:
+
+        # Read the file content
+        with open(filepath, "r", encoding="utf-8") as f:
+            text = f.read()
+
+        # Get result from cache
+        key = f"{keyword}-{filepath}" #TODO better keying maybe hasing?
         cached = r.get(key)
 
+        # Check if the result is cached
         if cached:
             print("Cache hit")
             count = int(cached)
