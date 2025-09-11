@@ -1,14 +1,15 @@
-import os
 import rpyc
-import time
 
-PORT = 18861
+HOSTNAME = "server"
+SERVERPORT = 5000
+REDISHOSTNAME = "redis"
+REDISPORT = 6379
 
 if __name__ == "__main__":
-    conn = rpyc.connect("server", PORT)
+    conn = rpyc.connect(HOSTNAME, SERVERPORT)
 
     for i in range (3):
-        text = "Hello world!"
+        text = "Hello Hello world!"
         keyword = "Hello" 
         result = conn.root.count_words(text, keyword)
 

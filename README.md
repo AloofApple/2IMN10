@@ -1,3 +1,8 @@
+# TODO
+
+TODO: Restructure the folders such that the client, server and load balancer have a own folder Each folder needs its own docker file.    
+
+
 # Setup
 
 Create virtual environment
@@ -19,7 +24,7 @@ pip freeze > requirements.txt
 
 To build an image and run them.
 ```
-docker build --pull -t ads:lab .
-docker compose up
+docker-compose up --build
 ```
+
 

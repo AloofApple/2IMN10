@@ -1,20 +1,25 @@
 version: "3.9"
 services:
-
   client:
-    image: ads:lab
+    build: ./client
+    image: ads-client:lab
     container_name: client
     depends_on:
       - server
-    command: ["python", "client.py"]
+    command: ["python", "-u", "client.py"]
   
   server:
-    image: ads:lab
+    build: ./server
+    image: ads-server:lab
     container_name: server
     depends_on:
       - redis
+    ports:
+      - "5000:5000"
     command: ["python", "-u", "server.py"]
   
   redis:
     image: redis:7
     container_name: redis
+    ports:
+      - "6379:6379"
