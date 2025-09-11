@@ -2,8 +2,6 @@ import rpyc
 
 HOSTNAME = "server"
 SERVERPORT = 5000
-REDISHOSTNAME = "redis"
-REDISPORT = 6379
 
 if __name__ == "__main__":
     conn = rpyc.connect(HOSTNAME, SERVERPORT)
