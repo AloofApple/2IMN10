@@ -54,4 +54,4 @@ services:
       - server3
     ports:
       - "1200:1200"
-    command: ["python", "-u", "load_balancer.py"]
+    command: ["python", "-u", "load_balancer_server.py"]
