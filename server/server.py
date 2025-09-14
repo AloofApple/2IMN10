@@ -57,6 +57,6 @@ class WordCountService(rpyc.Service):
         return count
 
 if __name__ == "__main__":
-    server = ThreadedServer(WordCountService, port=SERVERPORT)
+    server = ThreadedServer(WordCountService, port=SERVERPORT, logger=None)
     print(f"server is running on port {SERVERPORT}")
     server.start()
