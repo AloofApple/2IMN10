@@ -2,7 +2,7 @@
 
 To build an image,  run them and choose the amount of clients.
 ```
-docker-compose up --build --scale client=5
+docker-compose up --build --scale client=2
 ```
 
 # Virtual Environment 

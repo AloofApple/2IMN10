@@ -45,20 +45,26 @@ async def handle_client(reader, writer):
 
     logging.info(f"redirecting client {client_addr} to server ({server_host}:{server_port})")
 
-    # forward the request to server
+    # try to connect to the server
     try:
         server_reader, server_writer = await asyncio.open_connection(server_host, server_port)
-    except ConnectionError:
+    except ConnectionError as e:
         logging.error(f"could not connect to server ({server_host}:{server_port}): {e}")
         writer.close()
         await writer.wait_closed()
         return
     
-    # actually add as a task the forwarding
-    await asyncio.gather(
-        forward(reader, server_writer),
-        forward(server_reader, writer)
-    )
+    lb.increment_connection((server_host, server_port))
+
+    # Actually forward data between client and server
+    try:
+        await asyncio.gather(
+            forward(reader, server_writer),
+            forward(server_reader, writer)
+        )
+    finally:
+        # ALways decrement connection count when done
+        lb.decrement_connection((server_host, server_port))
 
 async def main():
     server = await asyncio.start_server(handle_client, LOAD_BALANCER_HOST, LOAD_BALANCER_PORT)

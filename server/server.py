@@ -1,8 +1,8 @@
 import rpyc
 import redis
 import logging 
+import time
 from rpyc.utils.server import ThreadedServer
-import threading
 
 ############################################################################################################
 # Setup
@@ -27,17 +27,6 @@ r = redis.Redis(HOSTNAME, REDISPORT)
 #
 
 class WordCountService(rpyc.Service):
-    active_clients = 0
-    lock = threading.Lock()
-
-    def on_connect(self, conn):
-        with self.lock:
-            WordCountService.active_clients += 1
-
-    def on_disconnect(self, conn):
-        with self.lock:
-            WordCountService.active_clients -= 1
-
     def exposed_count_words(self, file_ref: int, keyword: str) -> int:
         # Open the file based on the reference
         if file_ref not in FILES_MAP:
@@ -59,11 +48,10 @@ class WordCountService(rpyc.Service):
             r.set(key, count)
             logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (😔 cache MISS)")
 
+        # Simulate processing delay for demonstration purposes
+        time.sleep(4)  
+
         return count
-    
-    def exposed_get_active_clients(self) -> int:
-        with self.lock:
-            return WordCountService.active_clients
 
 if __name__ == "__main__":
     server = ThreadedServer(WordCountService, port=SERVERPORT)

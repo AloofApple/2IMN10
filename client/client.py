@@ -45,7 +45,6 @@ def make_request(file_ref, keyword):
     # Slight delay between requests
     time.sleep(1)
 
-
 if __name__ == "__main__":
     for i in range (6):
         make_request(0, "of")
