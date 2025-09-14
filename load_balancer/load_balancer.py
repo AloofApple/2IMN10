@@ -1,5 +1,4 @@
 import random
-import rpyc
 import logging
 import asyncio
 
@@ -33,22 +32,32 @@ class LoadBalancer:
         self.connections[server] -= 1
 
     # Static approaches
-    def round_robin(self):
-        server = self.servers[self.index]
+    def round_robin(self, servers):
+        server = servers[self.index]
         self.index = (self.index + 1) % len(self.servers)
+
         return server
 
-    def random_choice(self):
-        return random.choice(self.servers)
+    def random_choice(self, servers):
+        return random.choice(servers)
     
     # Dynamic approach
-    def least_connections(self):
-        return min(self.connections, key=self.connections.get)
+    def least_connections(self, servers):
+        connections = {server: self.connections.get(server) for server in servers}
+
+        return min(connections, key=connections.get)
     
     # The method to get the server based on the chosen algorithm
     def get_server(self):
         # You can switch between different algorithms here
-        return self.least_connections()
+        healthy_servers = [s for s in self.servers if self.healthy.get(s, False)]
+
+        if not healthy_servers:
+            logging.error("No healthy servers available!")
+            raise Exception("No healthy servers available!")
+    
+        # pick strategy
+        return self.least_connections(healthy_servers)
     
     # Periodic health check
     async def health_check(self):

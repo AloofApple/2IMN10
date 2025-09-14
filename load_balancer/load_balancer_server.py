@@ -43,13 +43,13 @@ async def handle_client(reader, writer):
     client_addr = writer.get_extra_info("peername")
     server_host, server_port = lb.get_server()
 
-    logging.info(f"redirecting client {client_addr} to server ({server_host}:{server_port})")
+    logging.info(f"redirecting client {client_addr} to ({server_host}:{server_port})")
 
     # try to connect to the server
     try:
         server_reader, server_writer = await asyncio.open_connection(server_host, server_port)
-    except ConnectionError as e:
-        logging.error(f"could not connect to server ({server_host}:{server_port}): {e}")
+    except Exception as e:
+        logging.error(f"could not connect to ({server_host}:{server_port}): {e}")
         writer.close()
         await writer.wait_closed()
         return
