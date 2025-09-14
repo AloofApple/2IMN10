@@ -1,6 +1,16 @@
 import asyncio
-import random
+import logging
 from load_balancer import LoadBalancer
+
+############################################################################################################
+# Setup
+#
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(message)s",
+    datefmt="%H:%M:%S"
+)
 
 LOAD_BALANCER_HOST = "0.0.0.0"
 LOAD_BALANCER_PORT = 1200
@@ -11,17 +21,19 @@ SERVERS = [
     ("server3", 5000)
 ]
 
-# Initialize load balancer
 lb = LoadBalancer(SERVERS)
 
-# function that forwards data between client and working server
+############################################################################################################
+# Load Balancer Service
+#
+
 async def forward(reader, writer):
         try:
             while data := await reader.read(4096): # we read data and forward it
                 writer.write(data)
                 await writer.drain()
-        except ConnectionError:
-            print("There was a connection error") # Here, we can maybe assume that the server is down in the future (for example)
+        except Exception as e:
+            logging.error(f"forwarding error: {e}") # Here, we can maybe assume that the server is down in the future (for example)
         finally:
             writer.close()
 
@@ -31,13 +43,13 @@ async def handle_client(reader, writer):
     client_addr = writer.get_extra_info("peername")
     server_host, server_port = lb.get_server()
 
-    print(f"Redirecting client {client_addr[1]} to ({server_host}:{server_port}) \n")
+    logging.info(f"redirecting client {client_addr} to server ({server_host}:{server_port})")
 
     # forward the request to server
     try:
         server_reader, server_writer = await asyncio.open_connection(server_host, server_port)
     except ConnectionError:
-        print(f"Could not connect to ({server_host}:{server_port})")
+        logging.error(f"could not connect to server ({server_host}:{server_port}): {e}")
         writer.close()
         await writer.wait_closed()
         return
@@ -50,7 +62,7 @@ async def handle_client(reader, writer):
 
 async def main():
     server = await asyncio.start_server(handle_client, LOAD_BALANCER_HOST, LOAD_BALANCER_PORT)
-    print(f"Load balancer running on {LOAD_BALANCER_HOST}:{LOAD_BALANCER_PORT}")
+    logging.info(f"load balancer running on {LOAD_BALANCER_HOST}:{LOAD_BALANCER_PORT}")
     async with server:
         await server.serve_forever()
 
