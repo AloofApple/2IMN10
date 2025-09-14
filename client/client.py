@@ -1,7 +1,7 @@
 import rpyc
 
-HOSTNAME = "server1" #loadbalancer"
-PORT = 5000 #1200
+HOSTNAME = "loadbalancer"
+PORT = 1200
 
 if __name__ == "__main__":
     conn = rpyc.connect(HOSTNAME, PORT)
