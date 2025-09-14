@@ -2,6 +2,7 @@ import rpyc
 import redis
 import logging 
 import time
+import re
 from rpyc.utils.server import ThreadedServer
 
 ############################################################################################################
@@ -18,7 +19,7 @@ SERVERPORT = 5000
 HOSTNAME = "redis"
 REDISPORT = 6379
 FILES_MAP = {
-    0: "textfiles/example.txt",
+    "bee_movie": "textfiles/bee_movie_script.txt",
 }
 r = redis.Redis(HOSTNAME, REDISPORT)
 
@@ -27,7 +28,7 @@ r = redis.Redis(HOSTNAME, REDISPORT)
 #
 
 class WordCountService(rpyc.Service):
-    def exposed_count_words(self, file_ref: int, keyword: str) -> int:
+    def exposed_count_words(self, file_ref: str, keyword: str) -> int:
         # Open the file based on the reference
         if file_ref not in FILES_MAP:
             logging.error(f"invalid file reference: {file_ref}. Allowed references: {list(FILES_MAP.keys())}")
@@ -40,16 +41,18 @@ class WordCountService(rpyc.Service):
         key = f"{file_ref}-{keyword}"
         cached = r.get(key)
 
+        # Use regex to count whole word matches only so it ignores punctuation
         if cached:
             count = int(cached)
-            logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (😀 cache HIT)")
+            logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache HIT) 😀")
         else:
-            count = text.split().count(keyword)  # exact match only???
+            words = re.findall(r'\b\w+\b', text.lower())
+            count = words.count(keyword.lower())
             r.set(key, count)
-            logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (😔 cache MISS)")
+            logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache MISS) 😔")
 
         # Simulate processing delay for demonstration purposes
-        time.sleep(4)  
+        time.sleep(5)  
 
         return count
 

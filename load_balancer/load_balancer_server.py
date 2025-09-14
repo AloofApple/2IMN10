@@ -69,8 +69,11 @@ async def handle_client(reader, writer):
 async def main():
     server = await asyncio.start_server(handle_client, LOAD_BALANCER_HOST, LOAD_BALANCER_PORT)
     logging.info(f"load balancer running on {LOAD_BALANCER_HOST}:{LOAD_BALANCER_PORT}")
-    async with server:
-        await server.serve_forever()
+
+    await asyncio.gather(
+        server.serve_forever(),
+        lb.health_check()
+    )
 
 
 if __name__ == "__main__":

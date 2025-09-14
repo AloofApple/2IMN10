@@ -1,6 +1,7 @@
 import random
 import rpyc
 import logging
+import asyncio
 
 ############################################################################################################
 # Setup
@@ -20,8 +21,11 @@ class LoadBalancer:
     def __init__(self, servers):
         self.servers = servers
         self.connections = {server: 0 for server in servers}
+        self.healthy = {server: True for server in servers}
         self.index = 0
+        self.check_interval = 5  # seconds
 
+    # Methods to update connection counts
     def increment_connection(self, server):
         self.connections[server] += 1
 
@@ -45,3 +49,20 @@ class LoadBalancer:
     def get_server(self):
         # You can switch between different algorithms here
         return self.least_connections()
+    
+    # Periodic health check
+    async def health_check(self):
+        while True:
+            for host, port in self.servers:
+                try:
+                    reader, writer = await asyncio.open_connection(host, port)
+                    self.healthy[(host, port)] = True
+                    writer.close()
+                    logging.info(f"{host}:{port} is HEALTHY 😀")
+
+                    await writer.wait_closed()
+                except Exception:
+                    self.healthy[(host, port)] = False
+                    logging.warning(f"{host}:{port} is UNHEALTHY 😵")
+                    
+            await asyncio.sleep(self.check_interval)

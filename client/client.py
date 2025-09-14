@@ -1,6 +1,7 @@
 import rpyc
 import logging
 import time
+import random
 
 ############################################################################################################
 # Setup
@@ -23,8 +24,6 @@ PORT = 1200
 def make_request(file_ref, keyword):
     try:
         conn = rpyc.connect(HOSTNAME, PORT)
-        file_ref = 0
-        keyword = "of"
         logging.info(
             f"request keyword='{keyword}' in fileRef={file_ref}"
         )
@@ -37,14 +36,18 @@ def make_request(file_ref, keyword):
         )
 
     except Exception as e:
-        logging.error(f"request {i+1} failed: {e}")
+        logging.error(f"request failed: {e}")
 
     finally:
         conn.close()
 
     # Slight delay between requests
-    time.sleep(1)
+    time.sleep(2)
+
+KEYWORDS = ["bee", "black", "yellow", "honey", "flower", "buzz", "pollen"]
 
 if __name__ == "__main__":
-    for i in range (6):
-        make_request(0, "of")
+    while True:
+        word = random.choice(KEYWORDS)  # pick a random word
+        make_request("bee_movie", word)
+        time.sleep(random.uniform(0, 5))  # wait a bit before next request
