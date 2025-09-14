@@ -3,7 +3,6 @@ services:
   client:
     build: ./client
     image: ads-client:lab
-    container_name: client
     depends_on:
       - loadbalancer
     command: ["python", "-u", "client.py"]
