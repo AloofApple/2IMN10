@@ -59,8 +59,11 @@ def make_request(file_ref, keyword, delay=2):
 KEYWORDS = ["bee", "black", "January is the best month of the year", "yellow", "honey", "flower", "buzz", "pollen", "sting", "swarm", 
             "queen", "Barry", "Adam", "Vanessa", "yes", "no", "maybe", "hello", "goodbye"]
 
+KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering", "Thine eyes"]
+
+
 if __name__ == "__main__":        
     while True:
-        word = random.choice(KEYWORDS)  # pick a random word 
-        make_request("bee_movie", word)
+        word = random.choice(KEYWORDS_SHAKESPEARE)  # pick a random word 
+        make_request("shakespeare", word)
         time.sleep(random.uniform(0, 5))  # wait a bit before next request
