@@ -21,7 +21,7 @@ PORT = 1200
 # Client Request
 #
 
-def make_request(file_ref, keyword):
+def make_request(file_ref, keyword, delay=2):
     try:
         conn = rpyc.connect(HOSTNAME, PORT)
         logging.info(
@@ -42,9 +42,10 @@ def make_request(file_ref, keyword):
         conn.close()
 
     # Slight delay between requests
-    time.sleep(2)
+    time.sleep(delay)
 
-KEYWORDS = ["bee", "black", "yellow", "honey", "flower", "buzz", "pollen"]
+KEYWORDS = ["bee", "black", "yellow", "honey", "flower", "buzz", "pollen", "sting", "swarm", 
+            "queen", "Barry", "Adam", "Vanessa", "yes", "no", "maybe", "hello", "goodbye"]
 
 if __name__ == "__main__":
     while True:
