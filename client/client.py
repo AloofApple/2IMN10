@@ -15,7 +15,7 @@ logging.basicConfig(
 
 HOSTNAME = "loadbalancer"
 PORT = 1200
-TESTING = False
+TESTING = True
 
 ############################################################################################################
 # Client Request
@@ -24,28 +24,20 @@ TESTING = False
 def make_request(file_ref, keyword, delay=2):
     try:
         conn = rpyc.connect(HOSTNAME, PORT)
-        if not TESTING: # if we are testing, we want clean logs
-            logging.info(
-                f"request keyword='{keyword}' in fileRef={file_ref}"
-            )
-
-        if TESTING:
-            initial = time.perf_counter_ns()
-
+        
+        logging.info(
+            f"request keyword='{keyword}' in fileRef={file_ref}"
+        )
 
         result = conn.root.count_words(file_ref, keyword)
-        final = time.perf_counter_ns()
 
-        if TESTING:
-            time_taken = final - initial
-            logging.info(f"{word}::{time_taken}")
+            
         # client_addr  = conn._channel.stream.sock.getsockname()
 
         # Log the result
-        if not TESTING:
-            logging.info(
-                f"received count={result} for keyword='{keyword}' in fileRef={file_ref}"
-            )
+        logging.info(
+            f"received count={result} for keyword='{keyword}' in fileRef={file_ref}"
+        )
 
     except Exception as e:
         logging.error(f"request failed: {e}")
@@ -59,11 +51,36 @@ def make_request(file_ref, keyword, delay=2):
 KEYWORDS = ["bee", "black", "January is the best month of the year", "yellow", "honey", "flower", "buzz", "pollen", "sting", "swarm", 
             "queen", "Barry", "Adam", "Vanessa", "yes", "no", "maybe", "hello", "goodbye"]
 
-KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering", "Thine eyes"]
+KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering", "Thine eyes", "cheek", "she", "compare", "tyrannous", "good faith", "love", "hate", "night", "day", "sweet", "bitter", "happy", "sad"]
+
+
+def testing_request(file_ref, keyword):
+    try:
+        conn = rpyc.connect(HOSTNAME, PORT)
+        initial = time.perf_counter_ns()
+        result = conn.root.count_words(file_ref, keyword)
+        final = time.perf_counter_ns()
+        time_taken = final - initial
+        logging.info(f"{keyword}::{time_taken}")
+
+    except Exception as e:
+        logging.error(f"request failed: {e}")
+    finally:
+        conn.close() 
+
+def testing():
+    # Running a series of requests (the 2nd loop is to test impact of cache!)
+    for i in range(2):
+        for word in KEYWORDS_SHAKESPEARE:
+            testing_request("shakespeare", word)
 
 
 if __name__ == "__main__":        
-    while True:
-        word = random.choice(KEYWORDS_SHAKESPEARE)  # pick a random word 
-        make_request("shakespeare", word)
-        time.sleep(random.uniform(0, 5))  # wait a bit before next request
+    if TESTING:
+        testing()
+    else:
+        while True:
+            word = random.choice(KEYWORDS_SHAKESPEARE)  # pick a random word 
+            make_request("shakespeare", word)
+            time.sleep(random.uniform(0, 5))  # wait a bit before next request
+
