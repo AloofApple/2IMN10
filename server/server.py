@@ -20,6 +20,7 @@ HOSTNAME = "redis"
 REDISPORT = 6379
 FILES_MAP = {
     "bee_movie": "textfiles/bee_movie_script.txt",
+    "shakespeare": "textfiles/shakespeare.txt"
 }
 r = redis.Redis(HOSTNAME, REDISPORT)
 
@@ -52,7 +53,7 @@ class WordCountService(rpyc.Service):
             logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache MISS) 😔")
 
         # Simulate processing delay for demonstration purposes
-        time.sleep(5)  
+        #time.sleep(5)  
 
         return count
 
