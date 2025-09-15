@@ -54,7 +54,6 @@ class LoadBalancer:
 
         if not healthy_servers:
             logging.error("No healthy servers available!")
-            raise Exception("No healthy servers available!")
     
         # pick strategy
         return self.least_connections(healthy_servers)
