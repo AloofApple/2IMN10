@@ -35,9 +35,6 @@ class WordCountService(rpyc.Service):
             logging.error(f"invalid file reference: {file_ref}. Allowed references: {list(FILES_MAP.keys())}")
             raise ValueError(f"invalid file reference: {file_ref}. Allowed references: {list(FILES_MAP.keys())}")
         
-        with open(FILES_MAP[file_ref], "r", encoding="utf-8") as f:
-            text = f.read()
-
         # Check cache for result using a composite key else compute and store
         key = f"{file_ref}-{keyword}"
         cached = r.get(key)
@@ -47,6 +44,8 @@ class WordCountService(rpyc.Service):
             count = int(cached)
             logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache HIT) 😀")
         else:
+            with open(FILES_MAP[file_ref], "r", encoding="utf-8") as f:
+                text = f.read()
             words = re.findall(r'\b\w+\b', text.lower())
             count = words.count(keyword.lower())
             r.set(key, count)
