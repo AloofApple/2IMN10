@@ -1,0 +1,23 @@
+services:
+  client:
+    build: ./client
+    image: ads-client:lab
+    depends_on:
+      - server
+    command: ["python", "-u", "client.py"]
+  
+  server:
+    build: ./server
+    image: ads-server:lab
+    container_name: server1
+    depends_on:
+      - redis
+    ports:
+      - "5000:5000"
+    command: ["python", "-u", "server.py"]
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
