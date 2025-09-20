@@ -5,6 +5,8 @@ services:
     depends_on:
       - loadbalancer
     command: ["python", "-u", "client.py"]
+    volumes:
+      - ./docs:/client/docs
   
   server1:
     build: ./server
@@ -41,6 +43,7 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    command: ["redis-server", "--save", '""', "--appendonly", "no"]
 
   loadbalancer:
     build: ./load_balancer

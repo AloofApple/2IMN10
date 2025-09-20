@@ -22,7 +22,7 @@ FILES_MAP = {
     "bee_movie": "textfiles/bee_movie_script.txt",
     "shakespeare": "textfiles/shakespeare.txt"
 }
-r = redis.Redis(HOSTNAME, REDISPORT)
+r = redis.Redis(host=HOSTNAME, port=REDISPORT, db=0)
 
 ############################################################################################################
 # Service
@@ -51,9 +51,6 @@ class WordCountService(rpyc.Service):
             count = words.count(keyword.lower())
             r.set(key, count)
             logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache MISS) 😔")
-
-        # Simulate processing delay for demonstration purposes
-        #time.sleep(5)  
 
         return count
 
