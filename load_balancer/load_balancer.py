@@ -56,7 +56,7 @@ class LoadBalancer:
             logging.error("No healthy servers available!")
     
         # pick strategy
-        return self.least_connections(healthy_servers)
+        return self.round_robin(healthy_servers)
     
     # Periodic health check
     async def health_check(self):

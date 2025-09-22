@@ -5,30 +5,35 @@ import os
 from datetime import datetime
 
 def plot_records(records, plotname="plot"):
-
-    # Extract latency_ms
+    # Extract latency_ms and timestamps
     latencies = [r["latency_ms"] for r in records if "latency_ms" in r]
-    requests = list(range(1, len(latencies)+1))
+    timestamps = [datetime.fromisoformat(r["timestamp"]) for r in records if "latency_ms" in r]
 
+    requests = list(range(1, len(latencies)+1))
     avg_latency = np.mean(latencies)
     tail_latency = np.percentile(latencies, 95)
+
+    # Calculate throughput
+    duration_sec = (timestamps[-1] - timestamps[0]).total_seconds()
+    throughput = len(latencies) / duration_sec
+
 
     plt.figure(figsize=(10,5))
     plt.plot(requests, latencies, marker='o', markersize=4, linestyle='-')
 
     # Draw average line
     plt.axhline(avg_latency, color='green', linestyle='--', label='Average')
-    plt.text(len(requests)*0.98, avg_latency - 0.1*avg_latency, f"{avg_latency:.2f} ms", color='green',
-             verticalalignment='top', horizontalalignment='right', fontsize=9)
+    plt.text(0.98*len(requests), avg_latency, f"{avg_latency:.2f} ms", color='green',
+             verticalalignment='bottom', horizontalalignment='right', fontsize=9)
 
     # Draw p95 line
     plt.axhline(tail_latency, color='red', linestyle='--', label='p95')
-    plt.text(len(requests)*0.98, tail_latency + 0.1*tail_latency, f"{tail_latency:.2f} ms", color='red',
+    plt.text(0.98*len(requests), tail_latency, f"{tail_latency:.2f} ms", color='red',
              verticalalignment='bottom', horizontalalignment='right', fontsize=9)
 
-    plt.xlabel("Request #")
+    plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
-    plt.title("Request Latencies Over Time")
+    plt.title(f"{plotname}\nThroughput: {throughput:.2f} req/sec")
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"docs/figs/{plotname}_timeline.png")
@@ -50,8 +55,8 @@ def load_all_json_records(folder="docs"):
     return all_records
 
 if __name__ == "__main__":
-    foldername = "docs/run1"
-    plotname = "run1"
+    foldername = "docs/round_robin2"
+    plotname = "Request Latencies Over Time - round_robin2"
 
     records = load_all_json_records(foldername)
     plot_records(records, plotname)

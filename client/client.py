@@ -30,8 +30,6 @@ KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering",
                         "good faith", "love", "hate", "night", "day", "sweet", 
                         "bitter", "happy", "sad" ]
 
-KEYWORDS_SHAKESPEARE = KEYWORDS_SHAKESPEARE[0:1]
-
 
 ############################################################################################################
 # Client Request
@@ -89,7 +87,7 @@ def testing():
 
 
 # For making the figures
-def simulate_load(file_ref, keywords, delay=0, num_requests=1):
+def simulate_load(file_ref, keywords, delay=0, num_requests=10):
     i = 0
     n = len(keywords)
     records = []
@@ -117,9 +115,10 @@ if __name__ == "__main__":
     if TESTING:
         testing()
     else:
-        foldername = "docs/run1"
+        # Scenario 50 clients and 10 requests each with no delay 
+        foldername = "docs/round_robin2"
         hostname = socket.gethostname()
-        records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=20)
+        records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE)
         save_records(records, folder=foldername, filename=f"{hostname}_results.json")
 
 

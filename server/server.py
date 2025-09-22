@@ -34,9 +34,6 @@ class WordCountService(rpyc.Service):
         if file_ref not in FILES_MAP:
             logging.error(f"invalid file reference: {file_ref}. Allowed references: {list(FILES_MAP.keys())}")
             raise ValueError(f"invalid file reference: {file_ref}. Allowed references: {list(FILES_MAP.keys())}")
-        
-        with open(FILES_MAP[file_ref], "r", encoding="utf-8") as f:
-            text = f.read()
 
         # Check cache for result using a composite key else compute and store
         key = f"{file_ref}-{keyword}"
@@ -47,6 +44,9 @@ class WordCountService(rpyc.Service):
             count = int(cached)
             logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache HIT) 😀")
         else:
+            with open(FILES_MAP[file_ref], "r", encoding="utf-8") as f:
+                text = f.read()
+                
             words = re.findall(r'\b\w+\b', text.lower())
             count = words.count(keyword.lower())
             r.set(key, count)
@@ -56,5 +56,7 @@ class WordCountService(rpyc.Service):
 
 if __name__ == "__main__":
     server = ThreadedServer(WordCountService, port=SERVERPORT, logger=None)
+
+    logging.info(f"Connected to Redis at {HOSTNAME}:{REDISPORT}, DB: {r.connection_pool.connection_kwargs['db']}")
     print(f"server is running on port {SERVERPORT}")
     server.start()
