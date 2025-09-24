@@ -58,7 +58,7 @@ class LoadBalancer:
             if not healthy_servers:
                 logging.error("No healthy servers available!")
         
-            server = self.least_connections(healthy_servers)
+            server = self.round_robin(healthy_servers)
 
             self.increment_connection(server)
 

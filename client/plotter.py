@@ -46,15 +46,11 @@ def plot_records(records, plotname="plot"):
 
     plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
-    plt.title(f"{plotname}\nThroughput: {throughput:.2f} req/sec, Cache Misses: {cache_miss_count}")
+    plt.title(f"{plotname}\nThroughput: {throughput:.2f} req/sec")
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"docs/figs/{plotname}_timeline.png")
     plt.close()
-
-    print(f"Total cache misses: {cache_miss_count}")
-
-
 
 def load_all_json_records(folder="docs"):
     all_records = []
@@ -72,8 +68,8 @@ def load_all_json_records(folder="docs"):
     return all_records
 
 if __name__ == "__main__":
-    foldername = "docs/least_connections/run1"
-    plotname = "Request Latencies Over Time - least_connections"
+    foldername = "docs/round_robin/run1"
+    plotname = "Request Latencies Over Time - round_robin"
 
     records = load_all_json_records(foldername)
     plot_records(records, plotname)

@@ -1,0 +1,62 @@
+[
+  {
+    "timestamp": "2025-09-24T19:57:11.826730",
+    "latency_ms": 9.982324,
+    "count": 30526,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:11.840766",
+    "latency_ms": 10.253747,
+    "count": 28566,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:12.938184",
+    "latency_ms": 1094.471689,
+    "count": 38,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:14.087989",
+    "latency_ms": 1123.656399,
+    "count": 57,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:14.417922",
+    "latency_ms": 257.207642,
+    "count": 4,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:14.711016",
+    "latency_ms": 222.000035,
+    "count": 0,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:14.817668",
+    "latency_ms": 56.381556,
+    "count": 94,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:14.875817",
+    "latency_ms": 45.343445,
+    "count": 2957,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:14.917708",
+    "latency_ms": 35.118829,
+    "count": 30,
+    "cache_miss": false
+  },
+  {
+    "timestamp": "2025-09-24T19:57:14.952912",
+    "latency_ms": 17.424055,
+    "count": 14,
+    "cache_miss": false
+  }
+]
