@@ -23,13 +23,15 @@ class LoadBalancer:
         self.healthy = {server: True for server in servers}
         self.index = 0
         self.check_interval = 5  # seconds
+        self.lock = asyncio.Lock()
 
     # Methods to update connection counts
     def increment_connection(self, server):
         self.connections[server] += 1
 
-    def decrement_connection(self, server):
-        self.connections[server] -= 1
+    async def decrement_connection(self, server):
+        async with self.lock:
+                self.connections[server] -= 1
 
     # Static approaches
     def round_robin(self, servers):
@@ -44,19 +46,23 @@ class LoadBalancer:
     # Dynamic approach
     def least_connections(self, servers):
         connections = {server: self.connections.get(server) for server in servers}
-
+        
         return min(connections, key=connections.get)
     
     # The method to get the server based on the chosen algorithm
-    def get_server(self):
+    async def get_server(self):
         # You can switch between different algorithms here
-        healthy_servers = [s for s in self.servers if self.healthy.get(s, False)]
+        async with self.lock: 
+            healthy_servers = [s for s in self.servers if self.healthy.get(s, False)]
 
-        if not healthy_servers:
-            logging.error("No healthy servers available!")
-    
-        # pick strategy
-        return self.round_robin(healthy_servers)
+            if not healthy_servers:
+                logging.error("No healthy servers available!")
+        
+            server = self.least_connections(healthy_servers)
+
+            self.increment_connection(server)
+
+            return server
     
     # Periodic health check
     async def health_check(self):

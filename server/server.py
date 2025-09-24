@@ -30,6 +30,8 @@ r = redis.Redis(host=HOSTNAME, port=REDISPORT, db=0)
 
 class WordCountService(rpyc.Service):
     def exposed_count_words(self, file_ref: str, keyword: str) -> int:
+        cache_miss = False
+
         # Open the file based on the reference
         if file_ref not in FILES_MAP:
             logging.error(f"invalid file reference: {file_ref}. Allowed references: {list(FILES_MAP.keys())}")
@@ -46,13 +48,14 @@ class WordCountService(rpyc.Service):
         else:
             with open(FILES_MAP[file_ref], "r", encoding="utf-8") as f:
                 text = f.read()
-                
+
+            cache_miss = True   
             words = re.findall(r'\b\w+\b', text.lower())
             count = words.count(keyword.lower())
             r.set(key, count)
             logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache MISS) 😔")
 
-        return count
+        return count, cache_miss
 
 if __name__ == "__main__":
     server = ThreadedServer(WordCountService, port=SERVERPORT, logger=None)

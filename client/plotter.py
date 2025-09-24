@@ -17,9 +17,22 @@ def plot_records(records, plotname="plot"):
     duration_sec = (timestamps[-1] - timestamps[0]).total_seconds()
     throughput = len(latencies) / duration_sec
 
-
     plt.figure(figsize=(10,5))
-    plt.plot(requests, latencies, marker='o', markersize=4, linestyle='-')
+    plt.plot(requests, latencies, marker='o', markersize=4, linestyle='-', label="Latencies")
+
+    # --- Mark cache misses with red crosses ---
+    miss_requests = []
+    miss_latencies = []
+    for i, r in enumerate(records, start=1):
+        if r.get("cache_miss", False):  # boolean flag
+            miss_requests.append(i)
+            miss_latencies.append(r["latency_ms"])
+
+    cache_miss_count = len(miss_requests)  # total number of cache misses
+
+    if miss_requests:
+        plt.scatter(miss_requests, miss_latencies, marker='x', color='red',
+                    s=70, label="Cache Misses", zorder=5)
 
     # Draw average line
     plt.axhline(avg_latency, color='green', linestyle='--', label='Average')
@@ -33,11 +46,15 @@ def plot_records(records, plotname="plot"):
 
     plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
-    plt.title(f"{plotname}\nThroughput: {throughput:.2f} req/sec")
+    plt.title(f"{plotname}\nThroughput: {throughput:.2f} req/sec, Cache Misses: {cache_miss_count}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"docs/figs/{plotname}_timeline.png")
     plt.close()
+
+    print(f"Total cache misses: {cache_miss_count}")
+
+
 
 def load_all_json_records(folder="docs"):
     all_records = []
@@ -55,8 +72,8 @@ def load_all_json_records(folder="docs"):
     return all_records
 
 if __name__ == "__main__":
-    foldername = "docs/round_robin2"
-    plotname = "Request Latencies Over Time - round_robin2"
+    foldername = "docs/least_connections/run1"
+    plotname = "Request Latencies Over Time - least_connections"
 
     records = load_all_json_records(foldername)
     plot_records(records, plotname)

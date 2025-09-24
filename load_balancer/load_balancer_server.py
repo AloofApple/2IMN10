@@ -41,7 +41,12 @@ async def forward(reader, writer):
 async def handle_client(reader, writer):
     # here, we decide which server to forward the request to
     client_addr = writer.get_extra_info("peername")
-    server_host, server_port = lb.get_server()
+    server = await lb.get_server()
+    if not server:
+        writer.close()
+        await writer.wait_closed()
+        return
+    server_host, server_port = server
 
     logging.info(f"redirecting client {client_addr} to ({server_host}:{server_port})")
 
@@ -54,8 +59,6 @@ async def handle_client(reader, writer):
         await writer.wait_closed()
         return
     
-    lb.increment_connection((server_host, server_port))
-
     # Actually forward data between client and server
     try:
         await asyncio.gather(
@@ -63,7 +66,7 @@ async def handle_client(reader, writer):
             forward(server_reader, writer)
         )
     finally:
-        # ALways decrement connection count when done
+        # Always decrement connection count when done
         lb.decrement_connection((server_host, server_port))
 
 async def main():

@@ -28,8 +28,9 @@ KEYWORDS = ["bee", "black", "January is the best month of the year",
 KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering", 
                         "Thine eyes", "cheek", "she", "compare", "tyrannous", 
                         "good faith", "love", "hate", "night", "day", "sweet", 
-                        "bitter", "happy", "sad" ]
+                        "bitter", "happy", "sad", "joy"]
 
+# KEYWORDS_SHAKESPEARE = KEYWORDS_SHAKESPEARE[0:10]
 
 ############################################################################################################
 # Client Request
@@ -41,14 +42,15 @@ def make_request(file_ref, keyword, delay=2):
         conn = rpyc.connect(HOSTNAME, PORT)
         
         initial = time.perf_counter_ns()
-        result = conn.root.count_words(file_ref, keyword)
+        result, cache_miss = conn.root.count_words(file_ref, keyword)
         final = time.perf_counter_ns()
         time_taken = (final - initial) / 1e6  # ms
 
         record = {
             "timestamp": datetime.now().isoformat(),
             "latency_ms": time_taken,
-            "count": result
+            "count": result,
+            "cache_miss": cache_miss
         }
 
         logging.info(
@@ -116,9 +118,9 @@ if __name__ == "__main__":
         testing()
     else:
         # Scenario 50 clients and 10 requests each with no delay 
-        foldername = "docs/round_robin2"
+        foldername = "docs/round_robin/run1delay"
         hostname = socket.gethostname()
-        records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE)
+        records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=0)
         save_records(records, folder=foldername, filename=f"{hostname}_results.json")
 
 
