@@ -3,6 +3,10 @@ import redis
 import logging 
 import time
 import re
+import argparse
+import threading
+import sys
+from typing import Tuple
 from rpyc.utils.server import ThreadedServer
 
 ############################################################################################################
@@ -29,7 +33,7 @@ r = redis.Redis(host=HOSTNAME, port=REDISPORT, db=0)
 #
 
 class WordCountService(rpyc.Service):
-    def exposed_count_words(self, file_ref: str, keyword: str) -> int:
+    def exposed_count_words(self, file_ref: str, keyword: str) -> Tuple[int, bool]:
         cache_miss = False
 
         # Open the file based on the reference
@@ -46,14 +50,17 @@ class WordCountService(rpyc.Service):
             count = int(cached)
             logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache HIT) 😀")
         else:
-            lock = r.lock(f"lock:{key}", timeout=10, blocking_timeout=5)
+
+            # The double cache check cause in most cases the cache shouldn't be locked but when it is missed only one should be 
+            # doing the calculation.
+            lock = r.lock(f"lock:{key}", timeout=10)
 
             with lock:
                 cached = r.get(key)
                 
                 if cached:
                     count = int(cached)
-                    logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache HIT after lock) 😅")
+                    logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache HIT) 😀")
                 else:
                     with open(FILES_MAP[file_ref], "r", encoding="utf-8") as f:
                         text = f.read()
@@ -65,10 +72,26 @@ class WordCountService(rpyc.Service):
                     logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache MISS) 😔")
 
         return count, cache_miss
+    
+def simulate_downtime():
+    time.sleep(args.lifetime)
+    print(f"Server {SERVERPORT} is simulating downtime now")
+    
+    time.sleep(5)
+    print(f"Server {SERVERPORT} is back online")
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--lifetime", type=int, default=0,
+                        help="Automatically shutdown server after X seconds (0 means no auto shutdown)")
+    args = parser.parse_args()
+
     server = ThreadedServer(WordCountService, port=SERVERPORT, logger=None)
 
     logging.info(f"Connected to Redis at {HOSTNAME}:{REDISPORT}, DB: {r.connection_pool.connection_kwargs['db']}")
     print(f"server is running on port {SERVERPORT}")
+
+    if args.lifetime > 0:
+        threading.Thread(target=simulate_downtime, daemon=True).start()
+
     server.start()

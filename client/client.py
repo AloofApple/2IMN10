@@ -109,6 +109,7 @@ def save_records(records, folder="results", filename="latencies.json"):
     filepath = os.path.join(folder, filename)
 
     logging.info(f"Saved {len(records)} records to {filepath}")
+
     # Save JSON
     with open(filepath, "w") as f:
         json.dump(records, f, indent=2)
@@ -120,7 +121,7 @@ if __name__ == "__main__":
         # Scenario 50 clients and 10 requests each with no delay 
         foldername = "docs/round_robin/run1"
         hostname = socket.gethostname()
-        records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=0)
+        records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=1)
         save_records(records, folder=foldername, filename=f"{hostname}_results.json")
 
 

@@ -1,46 +1,58 @@
+version: "3.9"
+
+networks:
+  frontend:
+  backend:
+
 services:
   client:
     build: ./client
     image: ads-client:lab
     depends_on:
       - loadbalancer
+    networks:
+      - frontend
     command: ["python", "-u", "client.py"]
     volumes:
       - ./docs:/client/docs
-  
+
   server1:
     build: ./server
     image: ads-server:lab
     container_name: server1
     depends_on:
       - redis
+    networks:
+      - backend
     ports:
-      - "5000:5000"
+      - "5000:5000" 
     command: ["python", "-u", "server.py"]
-    
+
   server2:
     build: ./server
     image: ads-server:lab
     container_name: server2
-    depends_on:
-      - redis
+    networks:
+      - backend
     ports:
       - "5001:5000"
-    command: ["python", "-u", "server.py"]
-    
+    command: ["python", "-u", "server.py", "--lifetime", "3"]
+
   server3:
     build: ./server
     image: ads-server:lab
     container_name: server3
-    depends_on:
-      - redis
+    networks:
+      - backend
     ports:
       - "5002:5000"
-    command: ["python", "-u", "server.py"]
-  
+    command: ["python", "-u", "server.py", "--lifetime", "3"]
+
   redis:
     image: redis:7
     container_name: redis
+    networks:
+      - backend
     ports:
       - "6379:6379"
     command: ["redis-server", "--save", '""', "--appendonly", "no"]
@@ -53,6 +65,9 @@ services:
       - server1
       - server2
       - server3
+    networks:
+      - frontend
+      - backend
     ports:
       - "1200:1200"
     command: ["python", "-u", "load_balancer_server.py"]
