@@ -1,17 +1,11 @@
 version: "3.9"
 
-networks:
-  frontend:
-  backend:
-
 services:
   client:
     build: ./client
     image: ads-client:lab
     depends_on:
-      - loadbalancer
-    networks:
-      - frontend
+      - server1
     command: ["python", "-u", "client.py"]
     volumes:
       - ./docs:/client/docs
@@ -22,64 +16,13 @@ services:
     container_name: server1
     depends_on:
       - redis
-    networks:
-      - backend
     ports:
       - "5000:5000" 
-    command: ["python", "-u", "server.py"]
-
-  server2:
-    build: ./server
-    image: ads-server:lab
-    container_name: server2
-    networks:
-      - backend
-    ports:
-      - "5001:5000"
-    command: ["python", "-u", "server.py"]
-
-  server3:
-    build: ./server
-    image: ads-server:lab
-    container_name: server3
-    networks:
-      - backend
-    ports:
-      - "5002:5000"
     command: ["python", "-u", "server.py"]
 
   redis:
     image: redis:7
     container_name: redis
-    networks:
-      - backend
     ports:
       - "6379:6379"
     command: ["redis-server", "--save", '""', "--appendonly", "no"]
-
-  loadbalancer:
-    build: ./load_balancer
-    image: ads-loadbalancer:lab
-    container_name: loadbalancer
-    depends_on:
-      - server1
-      - server2
-      - server3
-    networks:
-      - frontend
-      - backend
-    ports:
-      - "1200:1200"
-    command: ["python", "-u", "load_balancer_server.py"]
-
-  fail:
-    build: ./fail
-    container_name: fail
-    depends_on:
-      - server2
-      - server3
-    networks:
-      - backend
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock 
-    command: ["python", "-u", "fail.py"]
