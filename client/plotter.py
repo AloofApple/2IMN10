@@ -18,19 +18,24 @@ def plot_records(records, plotname="plot"):
     throughput = len(latencies) / duration_sec
 
     plt.figure(figsize=(10,5))
-    plt.plot(requests, latencies, marker='o', markersize=4, linestyle='-', label="Latencies")
+    plt.plot(requests, latencies, color="blue", linestyle="-", linewidth=2)
 
-    # --- Mark cache misses with red crosses ---
-    miss_requests = []
-    miss_latencies = []
+    # --- Separate cache hits and misses ---
+    hit_x, hit_y = [], []
+    miss_x, miss_y = [], []
     for i, r in enumerate(records, start=1):
-        if r.get("cache_miss", False):  # boolean flag
-            miss_requests.append(i)
-            miss_latencies.append(r["latency_ms"])
+        if "latency_ms" not in r:
+            continue
+        if r.get("cache_miss", False):
+            miss_x.append(i)
+            miss_y.append(r["latency_ms"])
+        else:
+            hit_x.append(i)
+            hit_y.append(r["latency_ms"])
 
-    if miss_requests:
-        plt.scatter(miss_requests, miss_latencies, marker='x', color='red',
-                    s=70, label="Cache Misses", zorder=5)
+    # Overlay points with different colors
+    plt.scatter(hit_x, hit_y, color="blue", s=40, label="Cache Hit", zorder=5)
+    plt.scatter(miss_x, miss_y, color="red", s=40, label="Cache Miss", zorder=5)
 
     # Draw average line
     plt.axhline(avg_latency, color='green', linestyle='--', label='Average')
