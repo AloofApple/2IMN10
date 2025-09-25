@@ -50,7 +50,8 @@ def make_request(file_ref, keyword, delay=2):
             "timestamp": datetime.now().isoformat(),
             "latency_ms": time_taken,
             "count": result,
-            "cache_miss": cache_miss
+            "cache_miss": cache_miss,
+            "keyword": keyword
         }
 
         logging.info(

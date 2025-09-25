@@ -50,20 +50,52 @@ def plot_records(records, plotname="plot"):
     plt.savefig(f"docs/figs/{plotname}_timeline.png")
     plt.close()
 
-def load_all_json_records(folder="docs"):
-    all_records = []
+def load_all_json_records(folders):
+    """
+    Load JSON records from a single folder or a list of folders,
+    then compute the average latency and count per request index across folders,
+    and preserve cache_miss as True if any experiment had True.
+    
+    Returns:
+        List of dicts with averaged values per point:
+        [{"timestamp": ..., "latency_ms": ..., "count": ..., "cache_miss": ..., "keyword": ...}, ...]
+    """
+    if isinstance(folders, str):
+        folders = [folders]
 
-    for filename in os.listdir(folder):
-        if filename.endswith(".json"):
-            path = os.path.join(folder, filename)
-            with open(path, "r") as f:
-                records = json.load(f)
-                all_records.extend([r for r in records if r is not None])
+    # Load all records for each folder separately
+    folders_records = []
+    for folder in folders:
+        all_records = []
+        for filename in os.listdir(folder):
+            if filename.endswith(".json"):
+                path = os.path.join(folder, filename)
+                with open(path, "r") as f:
+                    records = json.load(f)
+                    all_records.extend([r for r in records if r is not None])
+        # Sort by timestamp to maintain order
+        all_records.sort(key=lambda r: datetime.fromisoformat(r["timestamp"]))
+        folders_records.append(all_records)
 
-    # Sort by timestamp
-    all_records.sort(key=lambda r: datetime.fromisoformat(r["timestamp"]))
+    # Assume all experiments have the same number of points
+    num_points = 20 # len(folders_records[0])
 
-    return all_records
+    averaged_records = []
+    for i in range(num_points):
+        latencies = [folder[i]["latency_ms"] for folder in folders_records]
+        counts = [folder[i]["count"] for folder in folders_records]
+        cache_misses = [folder[i]["cache_miss"] for folder in folders_records]
+
+        avg_record = {
+            "timestamp": folders_records[0][i]["timestamp"],
+            "latency_ms": float(np.mean(latencies)),
+            "count": int(np.mean(counts)),
+            "cache_miss": any(cache_misses),
+            "keyword": folders_records[0][i]["keyword"]
+        }
+        averaged_records.append(avg_record)
+
+    return averaged_records
 
 if __name__ == "__main__":
     foldername = "docs/round_robin/run1fails"
