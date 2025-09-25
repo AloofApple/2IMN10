@@ -22,7 +22,7 @@ class LoadBalancer:
         self.connections = {server: 0 for server in servers}
         self.healthy = {server: True for server in servers}
         self.index = 0
-        self.check_interval = 5  # seconds
+        self.check_interval = 3  # seconds
         self.lock = asyncio.Lock()
 
     # Methods to update connection counts
@@ -35,8 +35,8 @@ class LoadBalancer:
 
     # Static approaches
     def round_robin(self, servers):
-        server = servers[self.index]
         self.index = (self.index + 1) % len(servers)
+        server = servers[self.index]
 
         return server
 

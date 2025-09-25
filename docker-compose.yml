@@ -36,7 +36,7 @@ services:
       - backend
     ports:
       - "5001:5000"
-    command: ["python", "-u", "server.py", "--lifetime", "3"]
+    command: ["python", "-u", "server.py"]
 
   server3:
     build: ./server
@@ -46,7 +46,7 @@ services:
       - backend
     ports:
       - "5002:5000"
-    command: ["python", "-u", "server.py", "--lifetime", "3"]
+    command: ["python", "-u", "server.py"]
 
   redis:
     image: redis:7
@@ -71,3 +71,15 @@ services:
     ports:
       - "1200:1200"
     command: ["python", "-u", "load_balancer_server.py"]
+
+  fail:
+    build: ./fail
+    container_name: fail
+    depends_on:
+      - server2
+      - server3
+    networks:
+      - backend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock 
+    command: ["python", "-u", "fail.py"]

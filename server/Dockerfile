@@ -5,5 +5,3 @@ RUN pip3 install rpyc redis
 
 WORKDIR /server
 COPY . /server/
-
-CMD ["python", "-u", "server.py"]

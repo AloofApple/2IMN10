@@ -28,8 +28,6 @@ def plot_records(records, plotname="plot"):
             miss_requests.append(i)
             miss_latencies.append(r["latency_ms"])
 
-    cache_miss_count = len(miss_requests)  # total number of cache misses
-
     if miss_requests:
         plt.scatter(miss_requests, miss_latencies, marker='x', color='red',
                     s=70, label="Cache Misses", zorder=5)
@@ -60,7 +58,7 @@ def load_all_json_records(folder="docs"):
             path = os.path.join(folder, filename)
             with open(path, "r") as f:
                 records = json.load(f)
-                all_records.extend(records)  # cleaner than looping
+                all_records.extend([r for r in records if r is not None])
 
     # Sort by timestamp
     all_records.sort(key=lambda r: datetime.fromisoformat(r["timestamp"]))
@@ -68,7 +66,7 @@ def load_all_json_records(folder="docs"):
     return all_records
 
 if __name__ == "__main__":
-    foldername = "docs/round_robin/run1"
+    foldername = "docs/round_robin/run1fails"
     plotname = "Request Latencies Over Time - round_robin"
 
     records = load_all_json_records(foldername)

@@ -119,7 +119,7 @@ if __name__ == "__main__":
         testing()
     else:
         # Scenario 50 clients and 10 requests each with no delay 
-        foldername = "docs/round_robin/run1"
+        foldername = "/client/docs/round_robin/run1fails"
         hostname = socket.gethostname()
         records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=1)
         save_records(records, folder=foldername, filename=f"{hostname}_results.json")

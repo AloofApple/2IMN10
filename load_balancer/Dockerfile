@@ -5,5 +5,3 @@ RUN pip3 install rpyc asyncio
 
 WORKDIR /load_balancer
 COPY . /load_balancer/
-
-CMD ["python", "-u", "simple_redirect.py"]

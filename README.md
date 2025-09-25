@@ -5,5 +5,9 @@ To build an image, run them and choose the amount of clients.
 docker-compose up --build --scale client=50
 ```
 
+To simulate failures 
+```
+.\simulate_fails.ps1
+```
 
 Note that you can rebuild the image by running again the same command. There is no need to delete images and/or containers.

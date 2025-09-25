@@ -5,5 +5,3 @@ RUN pip3 install rpyc
 
 WORKDIR /client
 COPY . /client/
-
-CMD ["python", "-u", "client.py"]
