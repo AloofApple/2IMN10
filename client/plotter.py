@@ -20,6 +20,7 @@ def plot_records(records, plotname="plot"):
 
     # --- Draw the line through all points ---
     plt.plot(requests, latencies, color="blue", linestyle="-", linewidth=2)
+    plt.xticks(requests)
 
     # --- Separate cache hits and misses ---
     hit_x, hit_y = [], []
