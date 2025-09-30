@@ -14,8 +14,8 @@ def plot_records(records, plotname="plot"):
     tail_latency = np.percentile(latencies, 95)
 
     # Calculate throughput
-    duration_sec = (timestamps[-1] - timestamps[0]).total_seconds()
-    throughput = len(latencies) / duration_sec
+    # duration_sec = (timestamps[-1] - timestamps[0]).total_seconds()
+    # throughput = len(latencies) / duration_sec
 
     plt.figure(figsize=(10,5))
     plt.plot(requests, latencies, color="blue", linestyle="-", linewidth=2)
@@ -49,7 +49,7 @@ def plot_records(records, plotname="plot"):
 
     plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
-    plt.title(f"{plotname}\nThroughput: {throughput:.2f} req/sec")
+    plt.title(f"{plotname}") #\nThroughput: {throughput:.2f} req/sec
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"docs/figs/{plotname}_timeline.png")
@@ -103,7 +103,9 @@ def load_all_json_records(folders):
     return averaged_records
 
 if __name__ == "__main__":
-    foldernames = ["docs/least_connections/run5"]
+    # foldernames = ["docs/round_robin/run3", "docs/round_robin/run2", "docs/round_robin/run1"]
+    foldernames = ["docs/least_connections/run3", "docs/least_connections/run2", "docs/least_connections/run1"]
+    # foldernames = ["docs/least_connections/run2"]
     plotname = "Request Latencies Over Time - Least Connections"
 
     records = load_all_json_records(foldernames)

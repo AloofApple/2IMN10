@@ -94,7 +94,7 @@ def save_records(records, folder="results", filename="latencies.json"):
 
 if __name__ == "__main__":        
     # Scenario 50 clients and 10 requests each with no delay 
-    foldername = "/client/docs/least_connections/run5"
+    foldername = "/client/docs/least_connections/run4"
     hostname = socket.gethostname()
     records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=0)
     save_records(records, folder=foldername, filename=f"{hostname}_results.json")
