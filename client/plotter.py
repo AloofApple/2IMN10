@@ -83,7 +83,7 @@ def load_all_json_records(folders):
         folders_records.append(all_records)
 
     # Assume all experiments have the same number of points
-    num_points = 20 # len(folders_records[0])
+    num_points = len(folders_records[0])
 
     averaged_records = []
     for i in range(num_points):
@@ -103,8 +103,8 @@ def load_all_json_records(folders):
     return averaged_records
 
 if __name__ == "__main__":
-    foldername = "docs/round_robin/run1fails"
-    plotname = "Request Latencies Over Time - round_robin"
+    foldernames = ["docs/least_connections/run5"]
+    plotname = "Request Latencies Over Time - Least Connections"
 
-    records = load_all_json_records(foldername)
+    records = load_all_json_records(foldernames)
     plot_records(records, plotname)
