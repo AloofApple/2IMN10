@@ -7,15 +7,11 @@ from datetime import datetime
 def plot_records(records, plotname="plot"):
     # Extract latency_ms and timestamps
     latencies = [r["latency_ms"] for r in records if "latency_ms" in r]
-    timestamps = [datetime.fromisoformat(r["timestamp"]) for r in records if "latency_ms" in r]
 
     requests = list(range(1, len(latencies)+1))
     avg_latency = np.mean(latencies)
     tail_latency = np.percentile(latencies, 95)
 
-    # Calculate throughput
-    duration_sec = (timestamps[-1] - timestamps[0]).total_seconds()
-    throughput = len(latencies) / duration_sec
 
     plt.figure(figsize=(10,5))
     plt.plot(requests, latencies, color="blue", linestyle="-", linewidth=2)
@@ -49,7 +45,7 @@ def plot_records(records, plotname="plot"):
 
     plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
-    plt.title(f"{plotname}\nThroughput: {throughput:.2f} req/sec")
+    plt.title(f"{plotname}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"docs/figs/{plotname}_timeline.png")
@@ -83,7 +79,7 @@ def load_all_json_records(folders):
         folders_records.append(all_records)
 
     # Assume all experiments have the same number of points
-    num_points = 20 # len(folders_records[0])
+    num_points = min(len(folder) for folder in folders_records)
 
     averaged_records = []
     for i in range(num_points):
@@ -102,9 +98,12 @@ def load_all_json_records(folders):
 
     return averaged_records
 
-if __name__ == "__main__":
-    foldername = "docs/round_robin/run1fails"
-    plotname = "Request Latencies Over Time - round_robin"
+## It takes about 18 seconds to start and stop after 12 seconds
 
-    records = load_all_json_records(foldername)
+if __name__ == "__main__":
+    foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
+    foldernames = ["docs/least_connections/run1", "docs/least_connections/run2", "docs/least_connections/run4"]
+    plotname = "Request Latencies Over Time - Least Connections"
+
+    records = load_all_json_records(foldernames)
     plot_records(records, plotname)

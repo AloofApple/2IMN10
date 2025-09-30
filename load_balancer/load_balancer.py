@@ -99,7 +99,7 @@ class LoadBalancer:
                 logging.error("No healthy servers available!")
                 return None
         
-            server = self.round_robin(healthy_servers)
+            server = self.least_connections(healthy_servers)
 
             self.increment_connection(server)
 

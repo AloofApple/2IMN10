@@ -1,4 +1,3 @@
-import os
 import time
 import subprocess
 
@@ -6,18 +5,16 @@ import subprocess
 SERVERS = ["server2", "server3"]
 
 # Timing in seconds
-STOP_AFTER = 3
-RESTART_AFTER = 9
+STOP_AFTER = 1
+RESTART_AFTER = 2
 
 def docker_stop(containers):
-    for c in containers:
-        print(f"Stopping {c}")
-        subprocess.run(["docker", "stop", c])
+    print(f"Stopping {', '.join(containers)}")
+    subprocess.run(["docker", "stop"] + containers)
 
 def docker_start(containers):
-    for c in containers:
-        print(f"Starting {c}")
-        subprocess.run(["docker", "start", c])
+    print(f"Starting {', '.join(containers)}")
+    subprocess.run(["docker", "start"] + containers)
 
 if __name__ == "__main__":
     print(f"waiting {STOP_AFTER}s to stop servers")
@@ -28,4 +25,4 @@ if __name__ == "__main__":
     time.sleep(RESTART_AFTER)
 
     docker_start(SERVERS)
-    print("Chaos controller finished")
+    print("Server controller finished")
