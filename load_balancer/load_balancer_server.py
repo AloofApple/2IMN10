@@ -46,7 +46,6 @@ async def connect_to_server(server):
     
     except Exception as e:
         logging.error(f"could not connect to ({server_host}:{server_port}): {e}")
-        await lb.set_health((server_host, server_port), False)
         return None, None
 
 async def handle_client(reader, writer):
@@ -90,14 +89,12 @@ async def handle_client(reader, writer):
     finally:
         await lb.decrement_connection(server)
 
-
 async def main():
     server = await asyncio.start_server(handle_client, LOAD_BALANCER_HOST, LOAD_BALANCER_PORT)
     logging.info(f"load balancer running on {LOAD_BALANCER_HOST}:{LOAD_BALANCER_PORT}")
 
     await asyncio.gather(
-        server.serve_forever(),
-        lb.health_check()
+        server.serve_forever()
     )
 
 

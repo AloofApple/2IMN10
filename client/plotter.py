@@ -7,9 +7,6 @@ from datetime import datetime
 def plot_records(records, plotname="plot"):
     # Extract latency_ms and timestamps
     latencies = [r["latency_ms"] for r in records if "latency_ms" in r]
-    timestamps = [datetime.fromisoformat(r["timestamp"]) for r in records]
-    start_time = timestamps[0]
-    elapsed_seconds = [(t - start_time).total_seconds() for t in timestamps]
 
     requests = list(range(1, len(latencies)+1))
     avg_latency = np.mean(latencies)
@@ -29,11 +26,6 @@ def plot_records(records, plotname="plot"):
     plt.axhline(tail_latency, color='red', linestyle='--', label='p95')
     plt.text(0.98*len(requests), tail_latency, f"{tail_latency:.2f} ms", color='red',
              verticalalignment='bottom', horizontalalignment='right', fontsize=9)
-    
-    for event_time, label, color in [(12, "Stop", "orange"), (18, "Restart", "purple")]:
-        # Find closest request index
-        closest_idx = min(range(len(elapsed_seconds)), key=lambda i: abs(elapsed_seconds[i]-event_time))
-        plt.axvline(requests[closest_idx], color=color, linestyle="--", label=label)
 
     plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
@@ -71,7 +63,7 @@ def load_all_json_records(folders):
         folders_records.append(all_records)
 
     # Assume all experiments have the same number of points
-    num_points = min(len(folder) for folder in folders_records)
+    num_points = len(folders_records[0])
 
     averaged_records = []
     for i in range(num_points):
@@ -90,13 +82,11 @@ def load_all_json_records(folders):
 
     return averaged_records
 
-## It takes about 18 seconds to start and stop after 12 seconds
-
 if __name__ == "__main__":
-    foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
-    # foldernames = ["docs/least_connections/run1", "docs/least_connections/run2", "docs/least_connections/run4"]
-    foldernames = ["docs/least_connections/run3"]
-    plotname = "Request Latencies Over Time - Least Connections 1"
+    # foldernames = ["docs/round_robin/run3", "docs/round_robin/run2", "docs/round_robin/run1"]
+    # foldernames = ["docs/least_connections/run3", "docs/least_connections/run2", "docs/least_connections/run1"]
+    foldernames = ["docs/round_robin/run1"]
+    plotname = "Request Latencies Over Time - Round Robin New"
 
     records = load_all_json_records(foldernames)
     plot_records(records, plotname)

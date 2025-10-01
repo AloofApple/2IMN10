@@ -71,15 +71,3 @@ services:
     ports:
       - "1200:1200"
     command: ["python", "-u", "load_balancer_server.py"]
-
-  fail:
-    build: ./fail
-    container_name: fail
-    depends_on:
-      - server2
-      - server3
-    networks:
-      - backend
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock 
-    command: ["python", "-u", "fail.py"]
