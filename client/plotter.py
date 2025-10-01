@@ -95,7 +95,7 @@ def load_all_json_records(folders):
 if __name__ == "__main__":
     foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
     # foldernames = ["docs/least_connections/run1", "docs/least_connections/run2", "docs/least_connections/run4"]
-    foldernames = ["docs/least_connections1/run1"]
+    foldernames = ["docs/least_connections/run3"]
     plotname = "Request Latencies Over Time - Least Connections 1"
 
     records = load_all_json_records(foldernames)

@@ -37,6 +37,7 @@ KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering",
 
 def make_request(file_ref, keyword, delay=2):
     record = None
+
     try:
         conn = rpyc.connect(HOSTNAME, PORT)
         timestamp = datetime.now().isoformat()
@@ -95,7 +96,7 @@ def save_records(records, folder="results", filename="latencies.json"):
 
 if __name__ == "__main__":        
     # Scenario 50 clients and 10 requests each with no delay 
-    foldername = "/client/docs/least_connections/run1"
+    foldername = "/client/docs/least_connections/run3"
     hostname = socket.gethostname()
     records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=0)
     save_records(records, folder=foldername, filename=f"{hostname}_results.json")
