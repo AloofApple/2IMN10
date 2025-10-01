@@ -1,0 +1,72 @@
+[
+  {
+    "timestamp": "2025-10-01T12:57:50.219309",
+    "latency_ms": 18.392898,
+    "count": 30526,
+    "cache_miss": false,
+    "keyword": "the"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.241846",
+    "latency_ms": 15.294294,
+    "count": 28566,
+    "cache_miss": false,
+    "keyword": "and"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.261197",
+    "latency_ms": 27.956144,
+    "count": 38,
+    "cache_miss": false,
+    "keyword": "Roses"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.297217",
+    "latency_ms": 12.000664,
+    "count": 57,
+    "cache_miss": false,
+    "keyword": "absence"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.313447",
+    "latency_ms": 16.478148,
+    "count": 4,
+    "cache_miss": false,
+    "keyword": "withering"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.334036",
+    "latency_ms": 19.089888,
+    "count": 0,
+    "cache_miss": false,
+    "keyword": "Thine eyes"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.356800",
+    "latency_ms": 17.771617,
+    "count": 94,
+    "cache_miss": false,
+    "keyword": "cheek"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.382127",
+    "latency_ms": 18.683035,
+    "count": 2957,
+    "cache_miss": false,
+    "keyword": "she"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.405534",
+    "latency_ms": 13.34724,
+    "count": 30,
+    "cache_miss": false,
+    "keyword": "compare"
+  },
+  {
+    "timestamp": "2025-10-01T12:57:50.425535",
+    "latency_ms": 13.864808,
+    "count": 14,
+    "cache_miss": false,
+    "keyword": "tyrannous"
+  }
+]

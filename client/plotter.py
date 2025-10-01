@@ -84,9 +84,9 @@ def load_all_json_records(folders):
 
 if __name__ == "__main__":
     # foldernames = ["docs/round_robin/run3", "docs/round_robin/run2", "docs/round_robin/run1"]
-    foldernames = ["docs/least_connections/run3", "docs/least_connections/run2", "docs/least_connections/run1"]
-    # foldernames = ["docs/round_robin/run2"]
-    plotname = "Request Latencies Over Time - Least Connections"
+    # foldernames = ["docs/least_connections/run3", "docs/least_connections/run2", "docs/least_connections/run1"]
+    foldernames = ["docs/round_robin/run1"]
+    plotname = "Request Latencies Over Time - Round Robin New"
 
     records = load_all_json_records(foldernames)
     plot_records(records, plotname)

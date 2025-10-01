@@ -40,13 +40,14 @@ def make_request(file_ref, keyword, delay=2):
     try:
         conn = rpyc.connect(HOSTNAME, PORT)
         
+        timestamp = datetime.now().isoformat()
         initial = time.perf_counter_ns()
         result, cache_miss = conn.root.count_words(file_ref, keyword)
         final = time.perf_counter_ns()
         time_taken = (final - initial) / 1e6  # ms
 
         record = {
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": timestamp,
             "latency_ms": time_taken,
             "count": result,
             "cache_miss": cache_miss,
