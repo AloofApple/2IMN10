@@ -1,0 +1,60 @@
+[
+  {
+    "timestamp": "2025-10-01T20:58:43.964476",
+    "latency_ms": 20.778389,
+    "count": 30526,
+    "cache_miss": false,
+    "keyword": "the"
+  },
+  {
+    "timestamp": "2025-10-01T20:58:43.993670",
+    "latency_ms": 22.988709,
+    "count": 28566,
+    "cache_miss": false,
+    "keyword": "and"
+  },
+  {
+    "timestamp": "2025-10-01T20:58:44.028902",
+    "latency_ms": 1045.068513,
+    "count": 38,
+    "cache_miss": false,
+    "keyword": "Roses"
+  },
+  {
+    "timestamp": "2025-10-01T20:58:45.120536",
+    "latency_ms": 50.685527,
+    "count": 57,
+    "cache_miss": false,
+    "keyword": "absence"
+  },
+  {
+    "timestamp": "2025-10-01T20:58:45.176863",
+    "latency_ms": 2118.57584,
+    "count": 4,
+    "cache_miss": false,
+    "keyword": "withering"
+  },
+  null,
+  null,
+  {
+    "timestamp": "2025-10-01T20:58:48.572558",
+    "latency_ms": 4655.888275,
+    "count": 2957,
+    "cache_miss": false,
+    "keyword": "she"
+  },
+  {
+    "timestamp": "2025-10-01T20:58:53.258472",
+    "latency_ms": 3835.481849,
+    "count": 30,
+    "cache_miss": false,
+    "keyword": "compare"
+  },
+  {
+    "timestamp": "2025-10-01T20:58:57.104926",
+    "latency_ms": 2644.662358,
+    "count": 14,
+    "cache_miss": false,
+    "keyword": "tyrannous"
+  }
+]
