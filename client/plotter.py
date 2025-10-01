@@ -7,31 +7,18 @@ from datetime import datetime
 def plot_records(records, plotname="plot"):
     # Extract latency_ms and timestamps
     latencies = [r["latency_ms"] for r in records if "latency_ms" in r]
+    timestamps = [datetime.fromisoformat(r["timestamp"]) for r in records]
+    start_time = timestamps[0]
+    elapsed_seconds = [(t - start_time).total_seconds() for t in timestamps]
 
     requests = list(range(1, len(latencies)+1))
     avg_latency = np.mean(latencies)
     tail_latency = np.percentile(latencies, 95)
 
-
     plt.figure(figsize=(10,5))
-    plt.plot(requests, latencies, color="blue", linestyle="-", linewidth=2)
-
-    # --- Separate cache hits and misses ---
-    hit_x, hit_y = [], []
-    miss_x, miss_y = [], []
-    for i, r in enumerate(records, start=1):
-        if "latency_ms" not in r:
-            continue
-        if r.get("cache_miss", False):
-            miss_x.append(i)
-            miss_y.append(r["latency_ms"])
-        else:
-            hit_x.append(i)
-            hit_y.append(r["latency_ms"])
-
-    # Overlay points with different colors
-    plt.scatter(hit_x, hit_y, color="blue", s=40, label="Cache Hit", zorder=5)
-    plt.scatter(miss_x, miss_y, color="red", s=40, label="Cache Miss", zorder=5)
+    plt.plot(
+        requests, latencies, linestyle="-", linewidth=2, marker="o", markersize=5, label="Latency"
+    )
 
     # Draw average line
     plt.axhline(avg_latency, color='green', linestyle='--', label='Average')
@@ -42,6 +29,11 @@ def plot_records(records, plotname="plot"):
     plt.axhline(tail_latency, color='red', linestyle='--', label='p95')
     plt.text(0.98*len(requests), tail_latency, f"{tail_latency:.2f} ms", color='red',
              verticalalignment='bottom', horizontalalignment='right', fontsize=9)
+    
+    for event_time, label, color in [(12, "Stop", "orange"), (18, "Restart", "purple")]:
+        # Find closest request index
+        closest_idx = min(range(len(elapsed_seconds)), key=lambda i: abs(elapsed_seconds[i]-event_time))
+        plt.axvline(requests[closest_idx], color=color, linestyle="--", label=label)
 
     plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
@@ -103,7 +95,8 @@ def load_all_json_records(folders):
 if __name__ == "__main__":
     foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
     # foldernames = ["docs/least_connections/run1", "docs/least_connections/run2", "docs/least_connections/run4"]
-    plotname = "Request Latencies Over Time - Round Robin x"
+    foldernames = ["docs/least_connections1/run1"]
+    plotname = "Request Latencies Over Time - Least Connections 1"
 
     records = load_all_json_records(foldernames)
     plot_records(records, plotname)

@@ -44,9 +44,9 @@ class LoadBalancer:
         return random.choice(servers)
     
     # Dynamic approach
-    def least_connections(self, servers):
+    def least_connections(self, servers, current_connections):
         # filter the active server counts based on the servers given.
-        connections = {server: self.connections.get(server) for server in servers}
+        connections = {server: current_connections.get(server) for server in servers}
         least_connected = None
         min_connections = float('inf')
 
@@ -91,16 +91,19 @@ class LoadBalancer:
 
     # The method to get the server based on the chosen algorithm
     async def get_server(self):
-        # You can switch between different algorithms here
-        async with self.lock: 
+        async with self.lock:
             healthy_servers = [s for s in self.servers if self.healthy.get(s, False)]
+            snapshot_connections = self.connections.copy()
 
-            if not healthy_servers:
-                logging.error("No healthy servers available!")
-                return None
-        
-            server = self.least_connections(healthy_servers)
+        if not healthy_servers:
+            logging.error("No healthy servers available!")
+            return None
 
-            self.increment_connection(server)
+        # Step 2: Pick server outside lock (expensive part)
+        server = self.least_connections(healthy_servers, snapshot_connections)
 
-            return server
+        # Step 3: Increment count back under lock (short critical section)
+        async with self.lock:
+            self.connections[server] += 1
+
+        return server
