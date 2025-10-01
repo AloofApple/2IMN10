@@ -60,7 +60,7 @@ class LoadBalancer:
     async def get_server(self):
         # You can switch between different algorithms here
         async with self.lock: 
-            server = self.least_connections(self.servers)
+            server = self.round_robin(self.servers)
 
             self.increment_connection(server)
 
