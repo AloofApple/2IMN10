@@ -7,35 +7,15 @@ from datetime import datetime
 def plot_records(records, plotname="plot"):
     # Extract latency_ms and timestamps
     latencies = [r["latency_ms"] for r in records if "latency_ms" in r]
-    timestamps = [datetime.fromisoformat(r["timestamp"]) for r in records if "latency_ms" in r]
 
     requests = list(range(1, len(latencies)+1))
     avg_latency = np.mean(latencies)
     tail_latency = np.percentile(latencies, 95)
 
-    # Calculate throughput
-    # duration_sec = (timestamps[-1] - timestamps[0]).total_seconds()
-    # throughput = len(latencies) / duration_sec
-
     plt.figure(figsize=(10,5))
-    plt.plot(requests, latencies, color="blue", linestyle="-", linewidth=2)
-
-    # --- Separate cache hits and misses ---
-    hit_x, hit_y = [], []
-    miss_x, miss_y = [], []
-    for i, r in enumerate(records, start=1):
-        if "latency_ms" not in r:
-            continue
-        if r.get("cache_miss", False):
-            miss_x.append(i)
-            miss_y.append(r["latency_ms"])
-        else:
-            hit_x.append(i)
-            hit_y.append(r["latency_ms"])
-
-    # Overlay points with different colors
-    plt.scatter(hit_x, hit_y, color="blue", s=40, label="Cache Hit", zorder=5)
-    plt.scatter(miss_x, miss_y, color="red", s=40, label="Cache Miss", zorder=5)
+    plt.plot(
+        requests, latencies, linestyle="-", linewidth=2, marker="o", markersize=5, label="Latency"
+    )
 
     # Draw average line
     plt.axhline(avg_latency, color='green', linestyle='--', label='Average')
@@ -49,7 +29,7 @@ def plot_records(records, plotname="plot"):
 
     plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
-    plt.title(f"{plotname}") #\nThroughput: {throughput:.2f} req/sec
+    plt.title(f"{plotname}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"docs/figs/{plotname}_timeline.png")
@@ -103,10 +83,10 @@ def load_all_json_records(folders):
     return averaged_records
 
 if __name__ == "__main__":
-    foldernames = ["docs/round_robin/run3", "docs/round_robin/run2", "docs/round_robin/run1"]
-    # foldernames = ["docs/least_connections/run3", "docs/least_connections/run2", "docs/least_connections/run1"]
+    # foldernames = ["docs/round_robin/run3", "docs/round_robin/run2", "docs/round_robin/run1"]
+    foldernames = ["docs/least_connections/run3", "docs/least_connections/run2", "docs/least_connections/run1"]
     # foldernames = ["docs/round_robin/run2"]
-    plotname = "Request Latencies Over Time - Round Robin x"
+    plotname = "Request Latencies Over Time - Least Connections"
 
     records = load_all_json_records(foldernames)
     plot_records(records, plotname)
