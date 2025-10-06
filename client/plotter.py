@@ -12,7 +12,7 @@ def plot_records(records, plotname="plot"):
     avg_latency = np.mean(latencies)
     tail_latency = np.percentile(latencies, 95)
 
-    plt.figure(figsize=(8,6))
+    plt.figure(figsize=(7,4))
 
     # --- Draw the line through all points ---
     plt.plot(
