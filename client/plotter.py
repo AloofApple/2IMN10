@@ -91,10 +91,10 @@ def load_all_json_records(folders):
     return averaged_records
 
 if __name__ == "__main__":
-    foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
-    # foldernames = ["docs/least_connections/run1", "docs/least_connections/run2", "docs/least_connections/run3"]
+    # foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
+    foldernames = ["docs/least_connections/run1", "docs/least_connections/run2", "docs/least_connections/run3"]
     # foldernames = ["docs/least_connections/run3"]
-    plotname = "Request Latencies Over Time - Round Robin"
+    plotname = "Request Latencies Over Time - Least Connections (50 clients requesting 10 keywords)"
 
     records = load_all_json_records(foldernames)
     plot_records(records, plotname)
