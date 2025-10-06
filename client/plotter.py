@@ -115,7 +115,7 @@ def load_all_json_records(folders):
 
 if __name__ == "__main__":
     foldernames = ["docs/experiment/run1", "docs/experiment/run2", "docs/experiment/run3"]
-    plotname = "Request Latencies Per Request"
+    plotname = "Request Latencies Per Request (1 client requesting 10 keywords twice)"
 
     records = load_all_json_records(foldernames)
     plot_records(records, plotname)
