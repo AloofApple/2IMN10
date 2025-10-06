@@ -59,25 +59,8 @@ async def handle_client(reader, writer):
         await writer.wait_closed()
         return
 
-    # Try to connect to that server, and if it fails try another one 
+    # Try to connect to that server 
     server_reader, server_writer = await connect_to_server(server)
-    if server_reader is None:
-        fallback_server = await lb.get_server()
-        if not fallback_server:
-            logging.error(f"No fallback servers available for client {client_addr}")
-            writer.close()
-            await writer.wait_closed()
-            return
-
-        logging.info(f"retrying client {client_addr} with fallback {fallback_server}")
-        server_reader, server_writer = await connect_to_server(fallback_server)
-        server = fallback_server
-
-        if server_reader is None:
-            logging.error(f"Fallback server also failed for client {client_addr}")
-            writer.close()
-            await writer.wait_closed()
-            return
 
     # Forward traffic
     logging.info(f"redirecting client {client_addr} to {server}")
