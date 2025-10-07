@@ -3,7 +3,7 @@ import subprocess
 from datetime import datetime
 
 # Servers to control
-SERVERS = ["server2", "server3"]
+SERVERS = ["server2"]
 
 def log(msg: str):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -11,7 +11,7 @@ def log(msg: str):
 
 def docker_stop(containers):
     log(f"Stopping {', '.join(containers)}")
-    subprocess.run(["docker", "stop"] + containers)
+    subprocess.run(["docker", "stop", "-t", str(3)] + containers)
 
 def docker_start(containers):
     log(f"Starting {', '.join(containers)}")
@@ -19,7 +19,6 @@ def docker_start(containers):
 
 if __name__ == "__main__":
     log("Script started")
-    time.sleep(1)
     docker_stop(SERVERS)
     time.sleep(3)
     docker_start(SERVERS)
