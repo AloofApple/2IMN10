@@ -37,13 +37,12 @@ KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering",
 
 def make_request(file_ref, keyword, delay=0):
     record = None
-    timestamp = datetime.now().isoformat()  # record once, before first attempt
+    timestamp = datetime.now().isoformat()  
+    initial = time.perf_counter_ns()
 
     for attempt in range(2):  # try up to 2 times
         try:
             conn = rpyc.connect(HOSTNAME, PORT)
-
-            initial = time.perf_counter_ns()
             result, cache_miss = conn.root.count_words(file_ref, keyword)
             final = time.perf_counter_ns()
             time_taken = (final - initial) / 1e6  # ms

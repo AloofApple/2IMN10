@@ -65,6 +65,7 @@ class LoadBalancer:
                 try:
                     # Check the server health and set it to True
                     reader, writer = await asyncio.open_connection(host, port)
+                    await asyncio.sleep(1)
                     await self.set_health((host, port), True)
                     logging.info(f"{host}:{port} is HEALTHY 😀")
                     

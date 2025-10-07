@@ -30,7 +30,7 @@ def plot_records(records, plotname="plot"):
     plt.text(0.98*len(requests), tail_latency, f"{tail_latency:.2f} ms", color='red',
              verticalalignment='bottom', horizontalalignment='right', fontsize=9)
     
-    for event_time, label, color in [(8, "Stop", "orange"), (16, "Restart", "purple")]:
+    for event_time, label, color in [(10, "Stop", "orange"), (20, "Restart", "purple")]:
         # Find closest request index
         closest_idx = min(range(len(elapsed_seconds)), key=lambda i: abs(elapsed_seconds[i]-event_time))
         plt.axvline(requests[closest_idx], color=color, linestyle="--", label=label)

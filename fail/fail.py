@@ -11,8 +11,7 @@ def log(msg: str):
 
 def docker_stop(containers):
     log(f"Stopping {', '.join(containers)}")
-    subprocess.run(["docker", "stop"] + containers)
-    # subprocess.run(["docker", "stop", "-t", str(6)] + containers)
+    subprocess.run(["docker", "stop", "-t", str(6)] + containers)
 
 def docker_start(containers):
     log(f"Starting {', '.join(containers)}")
@@ -21,6 +20,6 @@ def docker_start(containers):
 if __name__ == "__main__":
     log("Script started")
     docker_stop(SERVERS)
-    time.sleep(3)
+    # time.sleep(0)
     docker_start(SERVERS)
     log("Server controller finished")
