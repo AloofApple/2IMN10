@@ -2,6 +2,7 @@
 
 To build an image, run them and choose the amount of clients.
 ```
+docker-compose down -v --remove-orphans
 docker-compose up --build --scale client=50
 ```
 
