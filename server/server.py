@@ -47,27 +47,6 @@ class WordCountService(rpyc.Service):
             count = int(cached)
             logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache HIT) 😀")
         else:
-
-            # The double cache check cause in most cases the cache shouldn't be locked but when it is missed only one should be 
-            # doing the calculation.
-            # lock = r.lock(f"lock:{key}", timeout=4)
-
-            # with lock:
-            #     cached = r.get(key)
-                
-            #     if cached:
-            #         count = int(cached)
-            #         logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache HIT) 😀")
-            #     else:
-            #         with open(FILES_MAP[file_ref], "r", encoding="utf-8") as f:
-            #             text = f.read()
-
-            #         cache_miss = True
-            #         words = re.findall(r'\b\w+\b', text.lower())
-            #         count = words.count(keyword.lower())
-            #         r.set(key, count)
-            #         logging.info(f"response keyword='{keyword}' in file_ref={file_ref} has count={count} (cache MISS) 😔")
-
             with open(FILES_MAP[file_ref], "r", encoding="utf-8") as f:
                 text = f.read()
 

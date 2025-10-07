@@ -11,7 +11,8 @@ def log(msg: str):
 
 def docker_stop(containers):
     log(f"Stopping {', '.join(containers)}")
-    subprocess.run(["docker", "stop", "-t", str(3)] + containers)
+    subprocess.run(["docker", "stop"] + containers)
+    # subprocess.run(["docker", "stop", "-t", str(6)] + containers)
 
 def docker_start(containers):
     log(f"Starting {', '.join(containers)}")

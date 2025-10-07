@@ -35,34 +35,43 @@ KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering",
 # Client Request
 #
 
-def make_request(file_ref, keyword, delay=2):
+def make_request(file_ref, keyword, delay=0):
     record = None
-    try:
-        conn = rpyc.connect(HOSTNAME, PORT)
-        
-        timestamp = datetime.now().isoformat()
-        initial = time.perf_counter_ns()
-        result, cache_miss = conn.root.count_words(file_ref, keyword)
-        final = time.perf_counter_ns()
-        time_taken = (final - initial) / 1e6  # ms
+    timestamp = datetime.now().isoformat()  # record once, before first attempt
 
-        record = {
-            "timestamp": timestamp,
-            "latency_ms": time_taken,
-            "count": result,
-            "cache_miss": cache_miss,
-            "keyword": keyword
-        }
+    for attempt in range(2):  # try up to 2 times
+        try:
+            conn = rpyc.connect(HOSTNAME, PORT)
 
-        logging.info(
-            f"received count={result} for keyword='{keyword}' in fileRef={file_ref} in {time_taken:.2f} ms"
-        )
+            initial = time.perf_counter_ns()
+            result, cache_miss = conn.root.count_words(file_ref, keyword)
+            final = time.perf_counter_ns()
+            time_taken = (final - initial) / 1e6  # ms
 
-    except Exception as e:
-        logging.error(f"request failed: {e}")
+            record = {
+                "timestamp": timestamp,
+                "latency_ms": time_taken,
+                "count": result,
+                "cache_miss": cache_miss,
+                "keyword": keyword,
+            }
 
-    finally:
-        conn.close()
+            logging.info(
+                f"received count={result} for keyword='{keyword}' in fileRef={file_ref} "
+                f"in {time_taken:.2f} ms (attempt {attempt + 1})"
+            )
+
+            conn.close()
+            break 
+
+        except Exception as e:
+            logging.warning(f"attempt failed for keyword='{keyword}' ⚠️")
+
+        finally:
+            try:
+                conn.close()
+            except:
+                pass
 
     time.sleep(delay)
     return record
@@ -95,7 +104,7 @@ def save_records(records, folder="results", filename="latencies.json"):
 
 if __name__ == "__main__":        
     # Scenario 50 clients and 10 requests each with no delay 
-    foldername = "/client/docs/least_connections/run8"
+    foldername = "/client/docs/least_connections/run1"
     hostname = socket.gethostname()
     records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=0)
     save_records(records, folder=foldername, filename=f"{hostname}_results.json")
