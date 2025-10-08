@@ -55,7 +55,8 @@ async def handle_client(reader, writer):
     # First attempt to get server from load balancer.
     server = await lb.get_server()
     if not server:
-        logging.error(f"No healthy servers available for client {client_addr}")
+        lb.decrement_connection(server)
+        logging.error(f"No healthy server available for client {client_addr}")
         writer.close()
         await writer.wait_closed()
         return
@@ -65,7 +66,7 @@ async def handle_client(reader, writer):
     if server_reader is None:
         fallback_server = await lb.get_server()
         if not fallback_server:
-            logging.error(f"No fallback servers available for client {client_addr}")
+            logging.error(f"No fallback server available for client {client_addr}")
             writer.close()
             await writer.wait_closed()
             return

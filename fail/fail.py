@@ -20,6 +20,6 @@ def docker_start(containers):
 if __name__ == "__main__":
     log("Script started")
     docker_stop(SERVERS)
-    # time.sleep(0)
-    docker_start(SERVERS)
-    log("Server controller finished")
+    time.sleep(1)
+    # docker_start(SERVERS)
+    log("Script finished")

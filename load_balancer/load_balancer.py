@@ -22,6 +22,7 @@ class LoadBalancer:
         self.connections = {server: 0 for server in servers}
         self.healthy = {server: True for server in servers}
         self.index = 0
+        self.success_counts = {server: 0 for server in servers}
         self.check_interval = 3  # seconds
         self.conn_lock = asyncio.Lock()
         self.health_lock = asyncio.Lock()
@@ -62,22 +63,22 @@ class LoadBalancer:
     async def health_check(self):
         while True:
             for host, port in self.servers:
+                server = (host, port)
                 try:
                     # Check the server health and set it to True
-                    reader, writer = await asyncio.open_connection(host, port)
-                    await asyncio.sleep(1)
-                    await self.set_health((host, port), True)
-                    logging.info(f"{host}:{port} is HEALTHY 😀")
-                    
+                    reader, writer = await asyncio.open_connection(host, port) 
+                    await self.set_health(server, True)
+                    logging.info(f"Server {server} marked as HEALTHY.")
+
                     # Wait until writer is fully closed.
                     writer.close()
                     await writer.wait_closed()
 
                 except Exception:
                     # Set the server health to False
-                    await self.set_health((host, port), False)
-                    logging.warning(f"{host}:{port} is UNHEALTHY 😵")
-                    
+                    await self.set_health(server, False)
+                    logging.info(f"Server {server} marked as UNHEALTHY.")
+
             await asyncio.sleep(self.check_interval)
 
     # The method to get the server based on the chosen algorithm
