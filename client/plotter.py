@@ -7,35 +7,18 @@ from datetime import datetime
 def plot_records(records, plotname="plot"):
     # Extract latency_ms and timestamps
     latencies = [r["latency_ms"] for r in records if "latency_ms" in r]
-    timestamps = [datetime.fromisoformat(r["timestamp"]) for r in records if "latency_ms" in r]
+    timestamps = [datetime.fromisoformat(r["timestamp"]) for r in records]
+    start_time = timestamps[0]
+    elapsed_seconds = [(t - start_time).total_seconds() for t in timestamps]
 
     requests = list(range(1, len(latencies)+1))
     avg_latency = np.mean(latencies)
     tail_latency = np.percentile(latencies, 95)
 
-    # Calculate throughput
-    duration_sec = (timestamps[-1] - timestamps[0]).total_seconds()
-    throughput = len(latencies) / duration_sec
-
     plt.figure(figsize=(10,5))
-    plt.plot(requests, latencies, color="blue", linestyle="-", linewidth=2)
-
-    # --- Separate cache hits and misses ---
-    hit_x, hit_y = [], []
-    miss_x, miss_y = [], []
-    for i, r in enumerate(records, start=1):
-        if "latency_ms" not in r:
-            continue
-        if r.get("cache_miss", False):
-            miss_x.append(i)
-            miss_y.append(r["latency_ms"])
-        else:
-            hit_x.append(i)
-            hit_y.append(r["latency_ms"])
-
-    # Overlay points with different colors
-    plt.scatter(hit_x, hit_y, color="blue", s=40, label="Cache Hit", zorder=5)
-    plt.scatter(miss_x, miss_y, color="red", s=40, label="Cache Miss", zorder=5)
+    plt.plot(
+        requests, latencies, linestyle="-", linewidth=2, marker="o", markersize=5, label="Latency"
+    )
 
     # Draw average line
     plt.axhline(avg_latency, color='green', linestyle='--', label='Average')
@@ -46,10 +29,15 @@ def plot_records(records, plotname="plot"):
     plt.axhline(tail_latency, color='red', linestyle='--', label='p95')
     plt.text(0.98*len(requests), tail_latency, f"{tail_latency:.2f} ms", color='red',
              verticalalignment='bottom', horizontalalignment='right', fontsize=9)
+    
+    for event_time, label, color in [(6, "Stop", "orange"), (14, "Restart", "purple")]:
+        # Find closest request index
+        closest_idx = min(range(len(elapsed_seconds)), key=lambda i: abs(elapsed_seconds[i]-event_time))
+        plt.axvline(requests[closest_idx], color=color, linestyle="--", label=label)
 
     plt.xlabel("Request Number")
     plt.ylabel("Latency (ms)")
-    plt.title(f"{plotname}\nThroughput: {throughput:.2f} req/sec")
+    plt.title(f"{plotname}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"docs/figs/{plotname}_timeline.png")
@@ -83,7 +71,7 @@ def load_all_json_records(folders):
         folders_records.append(all_records)
 
     # Assume all experiments have the same number of points
-    num_points = 20 # len(folders_records[0])
+    num_points = min(len(folder) for folder in folders_records)
 
     averaged_records = []
     for i in range(num_points):
@@ -103,8 +91,10 @@ def load_all_json_records(folders):
     return averaged_records
 
 if __name__ == "__main__":
-    foldername = "docs/round_robin/run1fails"
-    plotname = "Request Latencies Over Time - round_robin"
+    # foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
+    foldernames = ["docs/least_connections/run1", "docs/least_connections/run2", "docs/least_connections/run3"]
+    foldernames = ["docs/least_connections/run4"]
+    plotname = "Request Latencies Over Time - Least Connections (50 clients requesting 10 keywords) T"
 
-    records = load_all_json_records(foldername)
+    records = load_all_json_records(foldernames)
     plot_records(records, plotname)

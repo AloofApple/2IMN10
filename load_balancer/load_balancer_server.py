@@ -34,7 +34,7 @@ async def forward(reader, writer):
                 writer.write(data)
                 await writer.drain()
         except Exception as e:
-            logging.error(f"forwarding error: {e}") # Here, we can maybe assume that the server is down in the future (for example)
+            logging.error(f"forwarding error: {e}") 
         finally:
             writer.close()
 
@@ -56,7 +56,8 @@ async def handle_client(reader, writer):
     # First attempt to get server from load balancer.
     server = await lb.get_server()
     if not server:
-        logging.error(f"No healthy servers available for client {client_addr}") 
+        lb.decrement_connection(server)
+        logging.error(f"No healthy server available for client {client_addr}")
         writer.close()
         await writer.wait_closed()
         return
@@ -67,7 +68,7 @@ async def handle_client(reader, writer):
         lb.decrement_connection(server) # in the case the server was considered healthy but is not
         fallback_server = await lb.get_server()
         if not fallback_server:
-            logging.error(f"No fallback servers available for client {client_addr}")
+            logging.error(f"No fallback server available for client {client_addr}")
             writer.close()
             await writer.wait_closed()
             return
