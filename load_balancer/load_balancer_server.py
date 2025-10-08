@@ -22,6 +22,7 @@ SERVERS = [
 ]
 
 lb = LoadBalancer(SERVERS)
+algorithm = lb.least_connections # random_choice | round_robin | least_connections
 
 ############################################################################################################
 # Load Balancer Service
@@ -55,7 +56,7 @@ async def handle_client(reader, writer):
     # First attempt to get server from load balancer.
     server = await lb.get_server()
     if not server:
-        logging.error(f"No healthy servers available for client {client_addr}")
+        logging.error(f"No healthy servers available for client {client_addr}") 
         writer.close()
         await writer.wait_closed()
         return
@@ -63,6 +64,7 @@ async def handle_client(reader, writer):
     # Try to connect to that server, and if it fails try another one 
     server_reader, server_writer = await connect_to_server(server)
     if server_reader is None:
+        lb.decrement_connection(server) # in the case the server was considered healthy but is not
         fallback_server = await lb.get_server()
         if not fallback_server:
             logging.error(f"No fallback servers available for client {client_addr}")

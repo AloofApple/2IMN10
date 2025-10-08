@@ -104,3 +104,17 @@ class LoadBalancer:
             self.increment_connection(server)
 
             return server
+        
+
+async def get_server_with_algorithm(lb: LoadBalancer, algorithm: function):
+    async with lb.lock:
+        healthy_servers = [s for s in lb.servers if lb.healthy.get(s, False)]
+
+        if not healthy_servers:
+            logging.error("No healthy servers available!")
+            return None
+
+        server = algorithm(healthy_servers)
+        lb.increment_connection(server)
+
+        return server
