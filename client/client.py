@@ -18,7 +18,6 @@ logging.basicConfig(
 
 HOSTNAME = "loadbalancer"
 PORT = 1200
-TESTING = False
 
 KEYWORDS = ["bee", "black", "January is the best month of the year", 
             "yellow", "honey", "flower", "buzz", "pollen", "sting", 
@@ -38,6 +37,7 @@ KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering",
 
 def make_request(file_ref, keyword, delay=2):
     record = None
+    conn = None
     try:
         conn = rpyc.connect(HOSTNAME, PORT)
         
@@ -62,31 +62,11 @@ def make_request(file_ref, keyword, delay=2):
         logging.error(f"request failed: {e}")
 
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     time.sleep(delay)
     return record
-
-# For testing purposes
-def testing_request(file_ref, keyword):
-    try:
-        conn = rpyc.connect(HOSTNAME, PORT)
-        initial = time.perf_counter_ns()
-        result = conn.root.count_words(file_ref, keyword)
-        final = time.perf_counter_ns()
-        time_taken = final - initial
-        logging.info(f"{keyword}::{time_taken}")
-
-    except Exception as e:
-        logging.error(f"request failed: {e}")
-    finally:
-        conn.close() 
-
-def testing():
-    # Running a series of requests (the 2nd loop is to test impact of cache!)
-    for i in range(2):
-        for word in KEYWORDS_SHAKESPEARE:
-            testing_request("shakespeare", word)
 
 
 # For making the figures
@@ -116,13 +96,10 @@ def save_records(records, folder="results", filename="latencies.json"):
         json.dump(records, f, indent=2)
 
 if __name__ == "__main__":        
-    if TESTING:
-        testing()
-    else:
-        # Scenario 50 clients and 10 requests each with no delay 
-        foldername = "/client/docs/round_robin/run1fails"
-        hostname = socket.gethostname()
-        records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=1)
-        save_records(records, folder=foldername, filename=f"{hostname}_results.json")
+    # Scenario 50 clients and 10 requests each with no delay 
+    foldername = "/client/docs/round_robin/run1fails"
+    hostname = socket.gethostname()
+    records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=1)
+    save_records(records, folder=foldername, filename=f"{hostname}_results.json")
 
 
