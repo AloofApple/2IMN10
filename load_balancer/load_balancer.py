@@ -82,7 +82,7 @@ class LoadBalancer:
             await asyncio.sleep(self.check_interval)
 
     # The method to get the server based on the chosen algorithm
-    async def get_server(self):
+    async def get_server(self, algorithm: function = round_robin):
         async with self.health_lock:
             healthy_servers = [s for s in self.servers if self.healthy.get(s, False)]
 
@@ -91,21 +91,7 @@ class LoadBalancer:
             return None
 
         async with self.conn_lock:
-            server = self.least_connections(healthy_servers)
+            server = algorithm(healthy_servers)
             self.increment_connection(server)
-
-        return server
-        
-
-async def get_server_with_algorithm(lb: LoadBalancer, algorithm: function):
-    async with lb.lock:
-        healthy_servers = [s for s in lb.servers if lb.healthy.get(s, False)]
-
-        if not healthy_servers:
-            logging.error("No healthy servers available!")
-            return None
-
-        server = algorithm(healthy_servers)
-        lb.increment_connection(server)
 
         return server

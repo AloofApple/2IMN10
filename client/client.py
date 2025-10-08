@@ -24,12 +24,7 @@ KEYWORDS = ["bee", "black", "January is the best month of the year",
             "swarm", "queen", "Barry", "Adam", "Vanessa", "yes", 
             "no", "maybe", "hello", "goodbye"]
 
-KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering", 
-                        "Thine eyes", "cheek", "she", "compare", "tyrannous", 
-                        "good faith", "love", "hate", "night", "day", "sweet", 
-                        "bitter", "happy", "sad", "joy"]
-
-# KEYWORDS_SHAKESPEARE = KEYWORDS_SHAKESPEARE[0:10]
+KEYWORDS_SHAKESPEARE = ["the", "and", "she", "cheek", "Roses", "absence", "compare", "withering", "tyrannous" , "Thine eyes"]
 
 ############################################################################################################
 # Client Request
@@ -37,12 +32,12 @@ KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering",
 
 def make_request(file_ref, keyword, delay=0):
     record = None
+    conn = None
     timestamp = datetime.now().isoformat()  
     initial = time.perf_counter_ns()
 
     for attempt in range(2):  # try up to 2 times
-        conn = None
-    try:
+        try:
             conn = rpyc.connect(HOSTNAME, PORT)
             result, cache_miss = conn.root.count_words(file_ref, keyword)
             final = time.perf_counter_ns()
@@ -66,12 +61,11 @@ def make_request(file_ref, keyword, delay=0):
 
         except Exception as e:
             logging.warning(f"attempt failed for keyword='{keyword}' ⚠️")
-
-    finally:
-        if conn:
-            conn.close()
+        finally:
+            if conn: conn.close()
 
     time.sleep(delay)
+
     return record
 
 # For making the figures
@@ -102,7 +96,7 @@ def save_records(records, folder="results", filename="latencies.json"):
 
 if __name__ == "__main__":        
     # Scenario 50 clients and 10 requests each with no delay 
-    foldername = "/client/docs/least_connections/run4"
+    foldername = "/client/docs/round_robin/run1"
     hostname = socket.gethostname()
     records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE, num_requests=10, delay=0)
     save_records(records, folder=foldername, filename=f"{hostname}_results.json")
