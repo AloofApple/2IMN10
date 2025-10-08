@@ -22,7 +22,7 @@ SERVERS = [
 ]
 
 lb = LoadBalancer(SERVERS)
-algorithm = lb.least_connections # random_choice | round_robin | least_connections
+algorithm = lb.round_robin # random_choice | round_robin | least_connections
 
 ############################################################################################################
 # Load Balancer Service
@@ -56,28 +56,32 @@ async def handle_client(reader, writer):
     # First attempt to get server from load balancer.
     server = await lb.get_server(algorithm)
     if not server:
-        lb.decrement_connection(server)
         logging.error(f"No healthy server available for client {client_addr}")
         writer.close()
         await writer.wait_closed()
         return
+    await lb.increment_connection(server)
 
     # Try to connect to that server, and if it fails try another one 
     server_reader, server_writer = await connect_to_server(server)
     if server_reader is None:
-        lb.decrement_connection(server) # in the case the server was considered healthy but is not
+        await lb.decrement_connection(server)
+
         fallback_server = await lb.get_server(algorithm)
         if not fallback_server:
             logging.error(f"No fallback server available for client {client_addr}")
             writer.close()
             await writer.wait_closed()
             return
+        await lb.increment_connection(fallback_server)
 
         logging.info(f"retrying client {client_addr} with fallback {fallback_server}")
         server_reader, server_writer = await connect_to_server(fallback_server)
         server = fallback_server
 
         if server_reader is None:
+            await lb.decrement_connection(server)
+
             logging.error(f"Fallback server also failed for client {client_addr}")
             writer.close()
             await writer.wait_closed()

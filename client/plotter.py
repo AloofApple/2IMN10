@@ -14,11 +14,12 @@ def plot_records(records, plotname="plot"):
     requests = list(range(1, len(latencies)+1))
     avg_latency = np.mean(latencies)
     tail_latency = np.percentile(latencies, 95)
-
+    
     plt.figure(figsize=(10,5))
     plt.plot(
         requests, latencies, linestyle="-", linewidth=2, marker="o", markersize=5, label="Latency"
     )
+    plt.ylim(0, 4500)
 
     # Draw average line
     plt.axhline(avg_latency, color='green', linestyle='--', label='Average')
@@ -91,10 +92,10 @@ def load_all_json_records(folders):
     return averaged_records
 
 if __name__ == "__main__":
-    # foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
+    foldernames = ["docs/round_robin/run1", "docs/round_robin/run2", "docs/round_robin/run3"]
     foldernames = ["docs/least_connections/run1", "docs/least_connections/run2", "docs/least_connections/run3"]
-    foldernames = ["docs/least_connections/run4"]
-    plotname = "Request Latencies Over Time - Least Connections (50 clients requesting 10 keywords) T"
+    # foldernames = ["docs/least_connections/run4"]
+    plotname = "Request Latencies Over Time - Least Connections (50 clients requesting 10 keywords)"
 
     records = load_all_json_records(foldernames)
     plot_records(records, plotname)

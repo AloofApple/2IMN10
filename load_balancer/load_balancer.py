@@ -1,6 +1,7 @@
 import random
 import logging
 import asyncio
+from typing import Callable
 
 ############################################################################################################
 # Setup
@@ -26,14 +27,17 @@ class LoadBalancer:
         self.check_interval = 3  # seconds
         self.conn_lock = asyncio.Lock()
         self.health_lock = asyncio.Lock()
+        self.decrement_lock = asyncio.Lock()
 
     # Methods to update connection counts
-    def increment_connection(self, server):
-       self.connections[server] += 1
-
-    async def decrement_connection(self, server):
+    async def increment_connection(self, server):
         async with self.conn_lock:
-            self.connections[server] -= 1
+            self.connections[server] += 1
+    
+    async def decrement_connection(self, server):
+        async with self.decrement_lock:
+            if self.connections[server] > 0:
+                self.connections[server] -= 1
 
     # Static approaches
     def round_robin(self, servers):
@@ -68,7 +72,7 @@ class LoadBalancer:
                     # Check the server health and set it to True
                     reader, writer = await asyncio.open_connection(host, port) 
                     await self.set_health(server, True)
-                    logging.info(f"Server {server} marked as HEALTHY.")
+                    logging.info(f"{server} marked as HEALTHY.")
 
                     # Wait until writer is fully closed.
                     writer.close()
@@ -77,12 +81,12 @@ class LoadBalancer:
                 except Exception:
                     # Set the server health to False
                     await self.set_health(server, False)
-                    logging.info(f"Server {server} marked as UNHEALTHY.")
+                    logging.info(f"{server} marked as UNHEALTHY.")
 
             await asyncio.sleep(self.check_interval)
 
     # The method to get the server based on the chosen algorithm
-    async def get_server(self, algorithm: function = round_robin):
+    async def get_server(self, algorithm: Callable = round_robin):
         async with self.health_lock:
             healthy_servers = [s for s in self.servers if self.healthy.get(s, False)]
 
@@ -92,6 +96,8 @@ class LoadBalancer:
 
         async with self.conn_lock:
             server = algorithm(healthy_servers)
-            self.increment_connection(server)
+
+            logging.info(f"Redirecting request to {server}.")
+            logging.info(f"Current connections: {self.connections}")
 
         return server
