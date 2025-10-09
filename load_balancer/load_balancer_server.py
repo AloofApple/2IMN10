@@ -22,7 +22,7 @@ SERVERS = [
 ]
 
 lb = LoadBalancer(SERVERS)
-algorithm = lb.least_connections # random_choice | round_robin | least_connections
+algorithm = lb.round_robin # random_choice | round_robin | least_connections
 
 ############################################################################################################
 # Load Balancer Service
@@ -34,7 +34,7 @@ async def forward(reader, writer):
                 writer.write(data)
                 await writer.drain()
         except Exception as e:
-            logging.error(f"forwarding error: {e}") # Here, we can maybe assume that the server is down in the future (for example)
+            logging.error(f"forwarding error: {e}") 
         finally:
             writer.close()
 
@@ -54,29 +54,34 @@ async def handle_client(reader, writer):
     client_addr = writer.get_extra_info("peername")
 
     # First attempt to get server from load balancer.
-    server = await lb.get_server()
+    server = await lb.get_server(algorithm)
     if not server:
-        logging.error(f"No healthy servers available for client {client_addr}") 
+        logging.error(f"No healthy server available for client {client_addr}")
         writer.close()
         await writer.wait_closed()
         return
+    await lb.increment_connection(server)
 
     # Try to connect to that server, and if it fails try another one 
     server_reader, server_writer = await connect_to_server(server)
     if server_reader is None:
-        await lb.decrement_connection(server) # in the case the server was considered healthy but is not
-        fallback_server = await lb.get_server()
+        await lb.decrement_connection(server)
+
+        fallback_server = await lb.get_server(algorithm)
         if not fallback_server:
-            logging.error(f"No fallback servers available for client {client_addr}")
+            logging.error(f"No fallback server available for client {client_addr}")
             writer.close()
             await writer.wait_closed()
             return
+        await lb.increment_connection(fallback_server)
 
         logging.info(f"retrying client {client_addr} with fallback {fallback_server}")
         server_reader, server_writer = await connect_to_server(fallback_server)
         server = fallback_server
 
         if server_reader is None:
+            await lb.decrement_connection(server)
+
             logging.error(f"Fallback server also failed for client {client_addr}")
             writer.close()
             await writer.wait_closed()

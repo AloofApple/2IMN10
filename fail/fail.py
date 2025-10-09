@@ -1,31 +1,25 @@
-import os
 import time
 import subprocess
+from datetime import datetime
 
 # Servers to control
-SERVERS = ["server2", "server3"]
+SERVERS = ["server2"]
 
-# Timing in seconds
-STOP_AFTER = 3
-RESTART_AFTER = 9
+def log(msg: str):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{now}] {msg}")
 
 def docker_stop(containers):
-    for c in containers:
-        print(f"Stopping {c}")
-        subprocess.run(["docker", "stop", c])
+    log(f"Stopping {', '.join(containers)}")
+    subprocess.run(["docker", "stop", "-t", str(6)] + containers)
 
 def docker_start(containers):
-    for c in containers:
-        print(f"Starting {c}")
-        subprocess.run(["docker", "start", c])
+    log(f"Starting {', '.join(containers)}")
+    subprocess.run(["docker", "start"] + containers)
 
 if __name__ == "__main__":
-    print(f"waiting {STOP_AFTER}s to stop servers")
-    time.sleep(STOP_AFTER)
+    log("Script started")
     docker_stop(SERVERS)
-
-    print(f"Waiting {RESTART_AFTER}s before restarting servers")
-    time.sleep(RESTART_AFTER)
-
+    time.sleep(3)
     docker_start(SERVERS)
-    print("Chaos controller finished")
+    log("Script finished")

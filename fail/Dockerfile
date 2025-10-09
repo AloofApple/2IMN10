@@ -7,4 +7,3 @@ RUN apt-get update && \
 
 WORKDIR /fail
 COPY . /fail/
-
