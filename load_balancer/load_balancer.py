@@ -106,7 +106,7 @@ class LoadBalancer:
             return server
         
 
-async def get_server_with_algorithm(lb: LoadBalancer, algorithm: function):
+async def get_server_with_algorithm(lb: LoadBalancer, algorithm):
     async with lb.lock:
         healthy_servers = [s for s in lb.servers if lb.healthy.get(s, False)]
 

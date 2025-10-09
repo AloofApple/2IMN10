@@ -64,7 +64,7 @@ async def handle_client(reader, writer):
     # Try to connect to that server, and if it fails try another one 
     server_reader, server_writer = await connect_to_server(server)
     if server_reader is None:
-        lb.decrement_connection(server) # in the case the server was considered healthy but is not
+        await lb.decrement_connection(server) # in the case the server was considered healthy but is not
         fallback_server = await lb.get_server()
         if not fallback_server:
             logging.error(f"No fallback servers available for client {client_addr}")
