@@ -24,10 +24,7 @@ KEYWORDS = ["bee", "black", "January is the best month of the year",
             "swarm", "queen", "Barry", "Adam", "Vanessa", "yes", 
             "no", "maybe", "hello", "goodbye"]
 
-KEYWORDS_SHAKESPEARE = ["the", "and", "Roses", "absence", "withering", 
-                        "Thine eyes", "cheek", "she", "compare", "tyrannous", 
-                        "good faith", "love", "hate", "night", "day", "sweet", 
-                        "bitter", "happy", "sad", "joy"]
+KEYWORDS_SHAKESPEARE = ["the", "and", "she", "cheek", "Roses", "absence", "compare", "withering", "tyrannous" , "Thine eyes"]
 
 ############################################################################################################
 # Client Request
@@ -92,7 +89,7 @@ def save_records(records, folder="results", filename="latencies.json"):
 
 if __name__ == "__main__":        
     # Scenario 1 client and 20 requests each with no delay 
-    foldername = "docs/experiment/run2"
+    foldername = "docs/experiment/run3"
     hostname = socket.gethostname()
     records = simulate_load("shakespeare", KEYWORDS_SHAKESPEARE[0:10], num_requests=20, delay=0)
     save_records(records, folder=foldername, filename=f"{hostname}_results.json")
