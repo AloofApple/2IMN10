@@ -32,6 +32,7 @@ KEYWORDS_SHAKESPEARE = ["the", "and", "she", "cheek", "Roses", "absence", "compa
 
 def make_request(file_ref, keyword, delay=2):
     record = None
+    conn = None
     try:
         conn = rpyc.connect(HOSTNAME, PORT)
         
@@ -56,7 +57,8 @@ def make_request(file_ref, keyword, delay=2):
         logging.error(f"request failed: {e}")
 
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     time.sleep(delay)
     return record
